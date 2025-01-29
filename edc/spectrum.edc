@@ -1,0 +1,73 @@
+group { name: "e/widgets/spectrum";
+   images.image: "diagonal_stripes.png" COMP;
+   parts {
+      part { name: "bg"; type: RECT;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel1.offset: 2 2;
+            rel2.offset: -3 -3;
+            color_class: "/bg-dark/normal/color";
+            offscale;
+         }
+      }
+      part { name: "pat";
+         scale: 1;
+         description { state: "default" 0.0;
+            rel.to: "bg";
+            rel1.offset: 2 2;
+            rel2.offset: -3 -3;
+            image.normal: "diagonal_stripes.png";
+            color_class: "/bg-dark-alt/normal/color";
+            TILED_PATTERN(240, 240)
+            offscale;
+         }
+      }
+      part { name: "clipper"; type: RECT;
+         description { state: "default" 0.0;
+            rel.to: "e.swallow.content";
+         }
+         description { state: "disabled" 0.0;
+            inherit: "default" 0.0;
+            color: 255 255 255 64; // no cc
+         }
+      }
+      part { name: "e.swallow.content"; type: SWALLOW;
+         clip_to: "clipper";
+         description { state: "default" 0.0;
+            rel.to: "pat";
+         }
+      }
+      part { name: "e.dragable.cursor"; type: RECT;
+         dragable.confine: "e.swallow.content";
+         dragable.x: 1 1 0;
+         dragable.y: 1 1 0;
+         description { state: "default" 0.0;
+            min: 1 1;
+            max: 1 1;
+            fixed: 1 1;
+            visible: 0;
+            rel.to: "e.swallow.content";
+            rel1.relative: 0.5 0.5;
+            rel2.relative: 0.5 0.5;
+         }
+      }
+      part { name: "cursor_x"; type: RECT;
+         description { state: "default" 0.0;
+            rel1.to_x: "e.dragable.cursor";
+            rel1.to_y: "e.swallow.content";
+            rel2.to_x: "e.dragable.cursor";
+            rel2.to_y: "e.swallow.content";
+            color_class: "/fg/normal/color/cursor";
+         }
+      }
+      part { name: "cursor_y"; type: RECT;
+         description { state: "default" 0.0;
+            rel1.to_x: "e.swallow.content";
+            rel1.to_y: "e.dragable.cursor";
+            rel2.to_x: "e.swallow.content";
+            rel2.to_y: "e.dragable.cursor";
+            color_class: "/fg/normal/color/cursor";
+         }
+      }
+   }
+}

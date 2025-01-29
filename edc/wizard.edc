@@ -1,0 +1,246 @@
+group { name: "e/wizard/main";
+   inherit: "e/desktop/background";
+   IMAGE_RING("ringa", 160)
+   IMAGE_RING("ringb", 160)
+   IMAGE_RING("ringc", 160)
+   images.image: "win_shadow.png" COMP;
+   parts {
+      part { name: "e.swallow.content"; type: SWALLOW;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel1.relative: 0.2 1.0;
+            rel1.offset: 16 16;
+            rel1.to_y: "e.text.title";
+            rel2.relative: 0.8 0.0;
+            rel2.offset: -17 -21;
+            rel2.to_y: "e.text.label";
+            max: 400 99999;
+            offscale;
+         }
+      }
+
+      part { name: "busy_area"; type: SPACER;
+         scale: 1;
+         description { state: "default" 0.0;
+            min: 40 40;
+            max: 40 40;
+            rel1.relative: 1.0 1.0;
+            rel1.offset: -17 -17;
+            rel2.relative: 1.0 1.0;
+            rel2.offset: -17 -17;
+            align: 1.0 1.0;
+            fixed: 1 1;
+            offscale;
+         }
+      }
+      BUSY("busy_area", "e,state,next,disable", "e", "e,state,next,enable", "e")
+
+      part { name: "shadow"; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel.to: "base";
+            WIN_SHADOW_SMALL;
+            color_class: "/shadow/normal/wizard";
+         }
+         description { state: "clicked" 0.0;
+            inherit;
+            image.border_scale_by: 0.25;
+            rel1.offset: -5 -3;
+            rel2.offset: 4 6;
+         }
+      }
+      part { name: "base"; type: RECT;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel.to: "e.text.label";
+            rel1.offset: -4 -4;
+            rel2.offset: 3 3;
+            color_class: "/bg/normal/button";
+            offscale;
+         }
+         description { state: "clicked" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/bg/pressed/button";
+         }
+      }
+      part { name: "block"; type: RECT;
+         description { state: "default" 0.0;
+            rel.to: "base";
+            color: 0 0 0 0; // no cc
+            visible: 0;
+         }
+         description { state: "disabled" 0.0;
+            inherit: "default" 0.0;
+            visible: 1;
+         }
+      }
+      part { name: "e.text.label"; type: TEXT; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            min: 96 32;
+            align: 0.5 1.0;
+            rel1.relative: 0.5  0.99;
+            rel1.offset: 16 -17;
+            rel2.relative: 0.5  0.99;
+            rel2.offset: -17 -17;
+            color_class: "/fg/normal/button";
+            text { font: FN; size: 10;
+               min: 1 1;
+               ellipsis: -1;
+            }
+            offscale;
+         }
+         description { state: "clicked" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/fg/pressed/button";
+         }
+         description { state: "disabled" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/fg/disabled/button";
+         }
+      }
+
+      part { name: "e.text.title"; type: TEXT;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel1.relative: 0.05 0.01;
+            rel1.offset: 16 16;
+            rel2.relative: 0.95 0.01;
+            rel2.offset: -17 16;
+            align: 0.5 0.0;
+            color_class: "/fg/normal/wizard/text/title";
+            text { font: FNBD; size: 20;
+               min: 0 1;
+               text_class: "init_title";
+            }
+            fixed: 0 1;
+            offscale;
+         }
+      }
+
+      part { name: "blanker"; type: RECT; mouse_events: 0;
+         description { state: "default" 0.0;
+            color: 0 0 0 255; // no cc
+         }
+         description { state: "visible" 0.0;
+            inherit: "default" 0.0;
+            color: 0 0 0 0; // no cc
+            visible: 0;
+         }
+      }
+   }
+   programs {
+      program { signal: "show"; source: "";
+         action: STATE_SET "visible" 0.0;
+         transition: DECELERATE 1.0 USE_DURATION_FACTOR 1;
+         target: "blanker";
+      }
+      program { signal: "mouse,down,1"; source: "base";
+         script {
+            new st[31];
+            new Float:vl;
+            get_state(PART:"block", st, 30, vl);
+            if (!strcmp(st, "default")) {
+              set_state(PART:"base", "clicked", 0.0);
+              set_state(PART:"shadow", "clicked", 0.0);
+              set_state(PART:"e.text.label", "clicked", 0.0);
+            }
+         }
+      }
+      program { signal: "mouse,up,1"; source: "base";
+         script {
+            new st[31];
+            new Float:vl;
+            get_state(PART:"block", st, 30, vl);
+            if (!strcmp(st, "default")) {
+              set_state(PART:"base", "default", 0.0);
+              set_state(PART:"shadow", "default", 0.0);
+              set_state(PART:"e.text.label", "default", 0.0);
+            }
+         }
+      }
+      program { signal: "mouse,clicked,1"; source: "base";
+         script {
+            new st[31];
+            new Float:vl;
+            get_state(PART:"block", st, 30, vl);
+            if (!strcmp(st, "default"))
+              emit("e,action,next", "");
+         }
+      }
+      program { signal: "e,state,next,enable"; source: "e";
+         action: STATE_SET "default" 0.0;
+         target: "block";
+         target: "e.text.label";
+      }
+      program { signal: "e,state,next,disable"; source: "e";
+         action: STATE_SET "disabled" 0.0;
+         target: "block";
+         target: "e.text.label";
+      }
+   }
+}
+
+group { name: "e/wizard/firstpage";
+   set { name: "logo_mono";
+      image { image: "logo.png" COMP;  size: 601 601 99999 99999; }
+      image { image: "logo2.png" COMP; size: 301 301   600   600; }
+      image { image: "logo3.png" COMP; size: 151 151   300   300; }
+      image { image: "logo4.png" COMP; size:  76  76   150   150; }
+      image { image: "logo5.png" COMP; size:  0    0    75    75; }
+   }
+   parts {
+      part { name: "logo";
+         scale: 1;
+         description { state: "default" 0.0;
+            image.normal: "logo_mono";
+            rel1.relative: 0.5 0.5;
+            rel2.relative: 0.5 0.5;
+            FIXED_SIZE(150, 150)
+            color_class: "/fg/selected-pressed";
+         }
+         description { state: "active";
+            inherit: "default" 0.0;
+            color_class: "/fg/selected";
+         }
+      }
+   }
+  programs {
+     program { name: "logo_pulse";
+        signal: "show"; source: "";
+        action: STATE_SET "active" 0.0;
+        target: "logo";
+        transition: SINUSOIDAL 1.0;
+        after: "logo_pulse2";
+     }
+     program { name: "logo_pulse2";
+        action: STATE_SET "default" 0.0;
+        target: "logo";
+        transition: SINUSOIDAL 1.0;
+        after: "logo_pulse";
+     }
+  }
+}
+
+group { name: "e/wizard/extra";
+   inherit: "e/desktop/background";
+   parts {
+      part { name: "blanker"; type: RECT; mouse_events: 0;
+         description { state: "default" 0.0;
+            color: 0 0 0 255; // no cc
+         }
+         description { state: "visible" 0.0;
+            inherit: "default" 0.0;
+            color: 0 0 0 0; // no cc
+            visible: 0;
+         }
+      }
+   }
+   programs {
+      program { signal: "show"; source: "";
+         action: STATE_SET "visible" 0.0;
+         transition: DECELERATE 1.0;
+         target: "blanker";
+      }
+   }
+}

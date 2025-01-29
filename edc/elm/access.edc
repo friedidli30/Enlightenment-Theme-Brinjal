@@ -1,0 +1,59 @@
+group { name: "elm/access/base/default";
+   parts {
+      part { name: "block1"; type: RECT; mouse_events:  0;
+         description { state: "default" 0.0;
+            color_class: "/dim/normal/access";
+            fixed: 0 1;
+            rel1.to: "base";
+            rel1.offset: -100000 -100000;
+            rel2.to: "base";
+            rel2.relative: 1.0 0.0;
+            rel2.offset: 100000 96;
+         }
+      }
+      part { name: "block2"; type: RECT; mouse_events:  0;
+         description { state: "default" 0.0;
+            color_class: "/dim/normal/access";
+            fixed: 0 1;
+            rel1.to: "base";
+            rel1.relative: 0.0 1.0;
+            rel1.offset: -100000 -97;
+            rel2.to: "base";
+            rel2.offset: 100000 100000;
+         }
+      }
+      part { name: "block3"; type: RECT; mouse_events:  0;
+         description { state: "default" 0.0;
+            color_class: "/dim/normal/access";
+            rel1.to: "block1";
+            rel1.relative: 0.0 1.0;
+            rel1.offset: 0 0;
+            rel2.to_x: "base";
+            rel2.to_y: "block2";
+            rel2.relative: 0.0 0.0;
+            rel2.offset: 96 -1;
+         }
+      }
+      part { name: "block4"; type: RECT; mouse_events:  0;
+         description { state: "default" 0.0;
+            color_class: "/dim/normal/access";
+            rel1.to_x: "base";
+            rel1.to_y: "block1";
+            rel1.relative: 1.0 1.0;
+            rel1.offset: -97 0;
+            rel2.to: "block2";
+            rel2.relative: 1.0 0.0;
+            rel2.offset: -1 -1;
+         }
+      }
+      part { name: "base"; type: RECT; mouse_events:  0;
+         description { state: "default" 0.0;
+            rel1.offset: -20 -20;
+            rel2.offset:  19 19;
+            color_class: "/bg/normal/access";
+         }
+      }
+   }
+}
+
+

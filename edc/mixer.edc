@@ -1,0 +1,132 @@
+group { name: "e/modules/mixer/main";
+   set { name: "speaker_clip";
+      image { image: "speaker-clip-160.png"  COMP; size: 81 81 99999 99999; }
+      image { image: "speaker-clip-080.png"  COMP; size: 41 41 80 80 99999; }
+      image { image: "speaker-clip-040.png"  COMP; size:  0  0 40 40; }
+   }
+   max: 160 160;
+   min: 16 16;
+   script {
+      public message(Msg_Type:type, id, ...) {
+         if ((type == MSG_INT_SET) && (id == 0)) {
+            new m, l, r;
+
+            m = getarg(2);
+            l = getarg(3);
+            r = getarg(4);
+
+            if (m) {
+               run_program(PROGRAM:"mute");
+            } else {
+               run_program(PROGRAM:"unmute");
+            }
+
+            custom_state(PART:"vol-l", "default", 0.0);
+            set_state_val(PART:"vol-l", STATE_REL1,
+                          (float(100 - l) * 0.5) / 100.0,
+                          (float(100 - l) * 1.0) / 100.0);
+            set_state_val(PART:"vol-l", STATE_REL2,
+                          float(50 + ((l + 1) / 2)) / 100.0,
+                          1.0);
+            set_state(PART:"vol-l", "custom", 0.0);
+
+            custom_state(PART:"vol-r", "default", 0.0);
+            set_state_val(PART:"vol-r", STATE_REL1,
+                          (float(100 - r) * 0.5) / 100.0,
+                          (float(100 - r) * 1.0) / 100.0);
+            set_state_val(PART:"vol-r", STATE_REL2,
+                          float(50 + ((r + 1) / 2)) / 100.0,
+                          1.0);
+            set_state(PART:"vol-r", "custom", 0.0);
+         }
+      }
+   }
+   parts {
+      part { name: "base";
+         description { state: "default" 0.0;
+            image.normal: "clock_base";
+            aspect: 1.0 1.0; aspect_preference: BOTH;
+            color_class: "/bg/normal/gadgets/mixer/base";
+         }
+      }
+      part { name: "middle";
+         description { state: "default" 0.0;
+            rel.to: "base";
+            rel1.relative: 0.3 0.3;
+            rel2.relative: 0.7 0.7;
+            image.normal: "clock_base";
+            color_class: "/bg/normal/gadgets/mixer/middle";
+         }
+      }
+      part { name: "state"; type: RECT;
+         description { state: "default" 0.0;
+            color_class: "/fg/normal/gadgets/mixer/volume/normal";
+         }
+         description { state: "mute" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/fg/normal/gadgets/mixer/volume/mute";
+         }
+      }
+      part { name: "state-l"; type: RECT;
+         clip_to: "state";
+         description { state: "default" 0.0;
+            rel1.relative: 0.0 0.0;
+            rel2.relative: 0.5 1.0;
+         }
+      }
+      part { name: "state-r"; type: RECT;
+         clip_to: "state";
+         description { state: "default" 0.0;
+            rel1.relative: 0.5 0.0;
+            rel2.relative: 1.0 1.0;
+         }
+      }
+      part { name: "vclip-l";
+         clip_to: "state-l";
+         description { state: "default" 0.0;
+            rel.to: "base";
+            image.normal: "speaker_clip";
+         }
+      }
+      part { name: "vclip-r";
+         clip_to: "state-r";
+         description { state: "default" 0.0;
+            rel.to: "base";
+            image.normal: "speaker_clip";
+         }
+      }
+      part { name: "vol-l";
+         clip_to: "vclip-l";
+         description { state: "default" 0.0;
+            rel.to: "base";
+            image.normal: "clock_base";
+         }
+      }
+      part { name: "vol-r";
+         clip_to: "vclip-r";
+         description { state: "default" 0.0;
+            rel.to: "base";
+            image.normal: "clock_base";
+         }
+      }
+      part { name: "over"; type: RECT;
+         description { state: "default" 0.0;
+            color: 0 0 0 0; // no cc
+         }
+      }
+   }
+   programs {
+      program { name: "mute";
+         action: STATE_SET "mute" 0.0;
+         transition: LINEAR 0.3 USE_DURATION_FACTOR 1;
+         target: "state";
+      }
+      program { name: "unmute";
+         action: STATE_SET "default" 0.0;
+         transition: LINEAR 0.2 USE_DURATION_FACTOR 1;
+         target: "state";
+      }
+   }
+}
+
+

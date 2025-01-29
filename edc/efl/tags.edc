@@ -1,0 +1,243 @@
+group { "efl/tags";
+   data.item: "version" "123";
+   data.item: "horizontal_pad" 0;
+   data.item: "vertical_pad" 0;
+   data.item: "closed_height" 0;
+   parts {
+      rect { "bg";
+         desc { "default";
+            color: 0 0 0 0; // no cc
+         }
+      }
+      swallow { "efl.background";
+         scale;
+         desc { "default";
+            rel.to: "bg";
+         }
+      }
+      swallow { "efl.box";
+         desc { "default";
+            rel.to: "bg";
+         }
+      }
+   }
+}
+
+group { "efl/tags/label";
+   data.item: "version" "123";
+   parts {
+      text { "efl.text";
+         nomouse;
+         scale;
+         desc { "default";
+            color_class: "/fg/normal/multibuttonentry/text";
+            text { font: FNBD; size: 10;
+               min: 1 1;
+               ellipsis: -1;
+               text_class: "tags_label";
+            }
+            rel1.offset: 4 4;
+            rel2.offset: -5 -5;
+            offscale;
+         }
+      }
+   }
+}
+
+group { "efl/tags/btn";
+   data.item: "version" "123";
+
+   styles {
+      style { name: "efl_tags_textblock_style";
+         base: "font="FN" align=0.5 font_size=10 color=#fff text_class=tags_item ellipsis=1.0"; // no cc
+         tag: "br" "\n";
+         tag: "ps" "ps";
+         tag: "hilight" "+ font="FNBD; // no cc
+         tag: "b" "+ font="FNBD;
+         tag: "tab" "\t";
+      }
+   }
+
+   script {
+      public disabled = 0;
+   }
+
+   parts {
+      rect { "base";
+         scale: 1;
+         desc { "default";
+            color_class: "/bg/normal/multibuttonentry/button";
+            rel1.offset: 2 2;
+            rel2.offset: -3 -3;
+            offscale;
+         }
+         desc { "pressed";
+            color_class: "/bg/pressed/multibuttonentry/button";
+         }
+      }
+      part { name: "glow"; type: RECT; mouse_events: 0;
+         description { state: "default" 0.0;
+            rel.to: "base";
+            rel1.offset: 0 -1;
+            rel1.relative: 0.0 1.0;
+            align: 0.5 1.0;
+            color_class: "/bg/selected/multibuttonentry/button/bar";
+            visible: 0;
+         }
+         description { state: "focused" 0.0;
+            inherit: "default" 0.0;
+            min: 0 5;
+            visible: 1;
+         }
+      }
+      image { "close";
+         nomouse;
+         desc { "default";
+            image.normal: "i-close";
+            rel.to: "del";
+            min: 15 15;
+            max: 15 15;
+            fixed: 1 1;
+            color_class: "/fg/normal/multibuttonentry/button/delete";
+         }
+         desc { "pressed";
+            inherit: "default";
+            color_class: "/fg/pressed/multibuttonentry/button/delete";
+         }
+         desc { "clicked";
+            inherit: "default";
+            color_class: "/fg/pressed/multibuttonentry/button/delete";
+         }
+      }
+      rect { "del";
+         scale;
+         desc { "default";
+            fixed: 1 0;
+            min: 15 15;
+            align: 1.0 0.5;
+            rel.to: "base";
+            rel1.relative: 1.0 0.0;
+            rel1.offset: -5 4;
+            rel2.offset: -5 -5;
+            color: 0 0 0 0; // no cc
+            offscale;
+         }
+      }
+      textblock { "efl.btn.text";
+         nomouse;
+         scale;
+         desc { "default";
+            text { style: "efl_tags_textblock_style";
+               min: 1 1;
+               ellipsis: -1;
+            }
+            rel1.offset: 4 4;
+            rel1.to: "base";
+            rel2.to_x: "del";
+            rel2.to_y: "base";
+            rel2.relative: 0.0 1.0;
+            rel2.offset: -5 -5;
+            min: 30 15;
+            offscale;
+            color_class: "/fg/normal/multibuttonentry/text/button";
+         }
+         desc { "pressed";
+            inherit: "default";
+            color_class: "/fg/pressed/multibuttonentry/text/button";
+         }
+         desc { "disabled";
+            inherit: "default";
+            color_class: "/fg/disabled/multibuttonentry/text/button";
+         }
+      }
+   }
+   programs {
+      program { signal: "mouse,clicked,1"; source: "base";
+         script {
+            if (get_int(disabled) == 0) {
+               emit("clicked", "");
+            }
+         }
+      }
+      program { signal: "efl,state,default"; source: "efl";
+         action: STATE_SET "default";
+         target: "glow";
+      }
+      program { signal: "efl,state,focused"; source: "efl";
+         action: STATE_SET "focused";
+         target: "glow";
+      }
+      program { signal: "efl,state,enabled"; source: "efl";
+         script {
+            set_state(PART:"efl.btn.text", "default", 0.0);
+            set_int(disabled , 0);
+         }
+      }
+      program { signal: "efl,state,disabled"; source: "efl";
+         script {
+            new st[31];
+            new Float: vl;
+            get_state(PART:"glow", st, 30, vl);
+            if (!strcmp(st, "focused"))
+              set_state(PART:"glow", "default", 0.0);
+            set_state(PART:"efl.btn.text", "disabled", 0.0);
+            set_int(disabled , 1);
+         }
+      }
+      program { signal: "efl,state,unfocused"; source: "efl";
+         action: STATE_SET "default";
+         target: "glow";
+      }
+      program { signal: "mouse,down,1"; source: "base";
+         script {
+            if (get_int(disabled) == 0) {
+               set_state(PART:"close", "pressed", 0.0);
+               set_state(PART:"base", "pressed", 0.0);
+               set_state(PART:"efl.btn.text", "pressed", 0.0);
+            }
+         }
+      }
+      program { signal: "mouse,up,1"; source: "base";
+         script {
+            if (get_int(disabled) == 0) {
+               set_state(PART:"close", "default", 0.0);
+               set_state(PART:"base", "default", 0.0);
+               set_state(PART:"efl.btn.text", "default", 0.0);
+            }
+         }
+      }
+      program { signal: "mouse,clicked,1"; source: "del";
+         action: SIGNAL_EMIT "efl,deleted" "efl";
+      }
+      program { signal: "mouse,down,1"; source: "del";
+         action: STATE_SET "clicked";
+         target: "close";
+      }
+      program { signal: "mouse,up,1"; source: "del";
+         action: STATE_SET "default";
+         target: "close";
+      }
+   }
+}
+
+group { "efl/tags/number";
+   data.item: "version" "123";
+   parts {
+      text { "efl.text";
+         nomouse;
+         scale;
+         desc { "default";
+            color_class: "/fg/normal/multibuttonentry/number";
+            text { font: FN; size: 10;
+               min: 1 1;
+               ellipsis: -1;
+               align: 0.5 0.5;
+               text_class: "tags_number";
+            }
+            rel1.offset: 4 4;
+            rel2.offset: -5 -5;
+            offscale;
+         }
+      }
+   }
+}

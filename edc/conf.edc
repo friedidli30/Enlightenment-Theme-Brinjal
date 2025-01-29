@@ -1,0 +1,92 @@
+group { name: "e/widgets/configure/main";
+   parts {
+      part { name: "base"; type: RECT;
+         description { state: "default" 0.0;
+            color_class: "/bg/normal/background";
+         }
+      }
+      part { name: "separator"; type: RECT; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            min: 16 1;
+            max: 99999 1;
+            rel1.relative: 0.0 1.0;
+            rel1.offset: 0 0;
+            rel1.to_y: "e.swallow.content";
+            rel2.relative: 1.0 0.0;
+            rel2.offset: -1 -1;
+            rel2.to_y: "e.swallow.button";
+            fixed: 0 1;
+            color_class: "/fg/normal/separator/horizontal";
+         }
+      }
+      part { name: "e.swallow.content"; type: SWALLOW;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel1.to_x: "base";
+            rel2.relative: 1.0 0.0;
+            rel2.offset: -1 -17;
+            rel2.to_y: "e.swallow.button";
+            offscale;
+         }
+      }
+      part { name: "e.swallow.button"; type: SWALLOW;
+         scale: 1;
+         description { state: "default" 0.0;
+            align: 0.5 1.0;
+            rel1.relative: 0.5 1.0;
+            rel1.offset: 0 -9;
+            rel2.relative: 0.5 1.0;
+            rel2.offset: -1 -9;
+            fixed: 1 1;
+            offscale;
+         }
+      }
+   }
+}
+
+group { name: "e/modules/conf/main";
+   images.image: "spanner.png" COMP;
+   min: 16 16;
+   parts {
+      part { name: "base"; type: RECT;
+         description { state: "default" 0.0;
+            color: 0 0 0 0; // no cc
+         }
+         description { state: "clicked" 0.0;
+            inherit: "default" 0.0;
+         }
+      }
+      part { name: "spanner"; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            aspect: 1.0 1.0; aspect_preference: BOTH;
+            rel.to: "base";
+            rel1.offset: 4 4;
+            rel2.offset: -5 -5;
+            image.normal: "spanner.png";
+            color_class: "/fg/normal/icon";
+            offscale;
+         }
+         description { state: "clicked" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/fg/pressed/icon";
+         }
+      }
+   }
+   programs {
+      program { signal: "mouse,down,1"; source: "base";
+         action: STATE_SET "clicked" 0.0;
+         target: "base";
+         target: "spanner";
+      }
+      program { signal: "mouse,up,1"; source: "base";
+         action: STATE_SET "default" 0.0;
+         target: "base";
+         target: "spanner";
+      }
+      program { signal: "mouse,clicked,1*"; source: "base";
+         action: SIGNAL_EMIT "e,action,conf" "";
+      }
+   }
+}

@@ -1,0 +1,73 @@
+/**
+Group: efl/group_item (@since 1.23)
+	 Part Text: efl.text
+	 Part Swallow: efl.extra
+	 Part Swallow: efl.icon
+	 Signal: efl,state,disabled
+	 Signal: efl,state,enabled
+
+*/
+group { "efl/group_item";
+   data.item: "version" "124";
+   nomouse;
+   program_source: "efl";
+   parts {
+      rect { "base";
+         desc { "default";
+            color_class: "/bg/normal/list/group";
+         }
+      }
+      text { "efl.text";
+         scale;
+         desc { "default";
+            offscale;
+            min: 0 ICMIN;
+            rel1.offset: 4 4;
+            rel1.relative: 1.0 0.0;
+            rel1.to_x: "efl.icon";
+            rel2.offset: -5 -5;
+            rel2.relative: 0.0 1.0;
+            rel2.to_x: "efl.extra";
+            align: 0.0 0.5;
+            color_class: "/fg/normal/list/group";
+            text { font: FNBD; size: 10;
+               min: 1 1;
+               ellipsis: -1;
+               align: 0.0 0.5;
+               text_class: "list_group_item";
+            }
+            link.base: "efl,state,enabled";
+         }
+         desc { "disabled";
+            inherit: "default";
+            color_class: "/fg/disabled/list/group";
+            link.base: "efl,state,disabled";
+         }
+      }
+      swallow { "efl.icon"; mouse;
+         scale;
+         desc { "default";
+            offscale;
+            min: ICMIN ICMIN;
+            fixed: 1 0;
+            align: 0.0 0.5;
+            rel1.relative: 0.0 0.0;
+            rel1.offset: 4 2;
+            rel2.relative: 0.0 1.0;
+            rel2.offset: 4 -3;
+         }
+      }
+      swallow { "efl.extra"; mouse;
+         scale;
+         desc { "default";
+            offscale;
+            min: ICMIN ICMIN;
+            fixed: 1 0;
+            align: 1.0 0.5;
+            rel1.offset: -5 4;
+            rel1.relative: 1.0 0.0;
+            rel2.offset: -5 -5;
+         }
+      }
+   }
+}

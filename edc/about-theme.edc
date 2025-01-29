@@ -1,0 +1,200 @@
+group { name: "e/theme/about";
+   // data.item: "borderless" "1";
+   // data.item: "shaped" "1";
+   images.image: "about-flat-bg.png" COMP;
+   images.image: "win_shadow.png" COMP;
+   min: 220 320;
+   parts {
+      part { name: "sizer"; type: SPACER;
+         scale: 1;
+         description { state: "default" 0.0;
+            min: 220 320;
+         }
+      }
+      part { name: "image";
+         description { state: "default" 0.0;
+            fixed: 1 1;
+            image.normal: "about-flat-bg.png";
+            aspect: 1.0 1.0; aspect_preference: NONE;
+         }
+      }
+      part { name: "name"; type: TEXT; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            fixed: 1 1;
+            color: 255 255 255 255; // no cc
+            rel1.relative: 0.5 0.5;
+            rel2.relative: 0.5 0.5;
+            text { font: FNBD; size: 48;
+               text: "FLAT";
+               min: 1 1;
+               ellipsis: -1;
+               align: 0.5 0.5;
+            }
+            offscale;
+         }
+      }
+      part { name: "name2"; type: TEXT; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            fixed: 1 1;
+            color: 255 255 255 192; // no cc
+            rel.to: "name";
+            rel1.relative: 0.0 1.0;
+            rel1.offset: 0 16;
+            rel2.relative: 1.0 1.0;
+            rel2.offset: -1 16;
+            align: 0.5 0.0;
+            text { font: FN; size: 10;
+               text: "The default theme for Enlightenment";
+               min: 1 1;
+               ellipsis: -1;
+               align: 0.5 0.0;
+            }
+            offscale;
+         }
+      }
+      ////////////////////////////////////////////////////////////////
+      part { name: "shadow"; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel.to: "base";
+            WIN_SHADOW_SMALL;
+            color_class: "/shadow/normal";
+            offscale;
+         }
+         description { state: "clicked" 0.0;
+            inherit;
+            image.border_scale_by: 0.125;
+            rel1.offset: -2 -1;
+            rel2.offset: 1 2;
+            color_class: "/shadow/pressed";
+         }
+      }
+      part { name: "base"; type: RECT;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel.to: "e.text.label";
+            rel1.offset: -6 -6;
+            rel2.offset: 5 5;
+            color_class: "/bg/normal/button";
+            offscale;
+         }
+         description { state: "clicked" 0.0;
+            inherit: "default" 0.0;
+            rel1.offset: -5 -5;
+            rel2.offset: 4 4;
+            color_class: "/bg/pressed/button";
+         }
+      }
+      part { name: "e.text.label"; type: TEXT; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel1.offset: -14 -14;
+            rel1.relative: 1.0 1.0;
+            rel2.offset: -14 -14;
+            rel2.relative: 1.0 1.0;
+            color_class: "/fg/normal/button";
+            align: 1.0 1.0;
+            min: 85 0;
+            text { font: FN; size: 10;
+               min: 1 1;
+               ellipsis: -1;
+               align: 0.5 0.5;
+               text_class: "button";
+            }
+            fixed: 1 1;
+            offscale;
+         }
+         description { state: "clicked" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/fg/pressed/button";
+         }
+      }
+      program { signal: "mouse,down,1*"; source: "base";
+         action: STATE_SET "clicked" 0.0;
+         target: "base";
+         target: "shadow";
+         target: "e.text.label";
+      }
+      program { signal: "mouse,up,1"; source: "base";
+         action: STATE_SET "default" 0.0;
+         target: "base";
+         target: "shadow";
+         target: "e.text.label";
+      }
+      program { signal: "mouse,clicked,1*"; source: "base";
+         action: SIGNAL_EMIT "e,action,close" "";
+      }
+      ////////////////////////////////////////////////////////////////
+      part { name: "shadow2"; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel.to: "base2";
+            WIN_SHADOW_SMALL;
+            color_class: "/shadow/normal";
+            offscale;
+         }
+         description { state: "clicked" 0.0;
+            inherit;
+            image.border_scale_by: 0.125;
+            rel1.offset: -2 -1;
+            rel2.offset: 1 2;
+            color_class: "/shadow/pressed";
+         }
+      }
+      part { name: "base2"; type: RECT;
+         description { state: "default" 0.0;
+            rel.to: "e.text.theme";
+            rel1.offset: -6 -6;
+            rel2.offset: 5 5;
+            color_class: "/bg/normal/button";
+         }
+         description { state: "clicked" 0.0;
+            inherit: "default" 0.0;
+            rel1.offset: -5 -5;
+            rel2.offset: 4 4;
+            color_class: "/bg/pressed/button";
+         }
+      }
+      part { name: "e.text.theme"; type: TEXT; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel1.offset: 13 -14;
+            rel1.relative: 0.0 1.0;
+            rel2.offset: 13 -14;
+            rel2.relative: 0.0 1.0;
+            color_class: "/fg/normal/button";
+            align: 0.0 1.0;
+            min: 85 0;
+            text { font: FN; size: 10;
+               min: 1 1;
+               ellipsis: -1;
+               align: 0.5 0.5;
+               text_class: "button";
+            }
+            fixed: 1 1;
+            offscale;
+         }
+         description { state: "clicked" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/fg/pressed/button";
+         }
+      }
+      program { signal: "mouse,down,1*"; source: "base2";
+         action: STATE_SET "clicked" 0.0;
+         target: "base2";
+         target: "shadow2";
+         target: "e.text.theme";
+      }
+      program { signal: "mouse,up,1"; source: "base2";
+         action: STATE_SET "default" 0.0;
+         target: "base2";
+         target: "shadow2";
+         target: "e.text.theme";
+      }
+      program { signal: "mouse,clicked,1*"; source: "base2";
+         action: SIGNAL_EMIT "e,action,settings,theme" "";
+      }
+   }
+}

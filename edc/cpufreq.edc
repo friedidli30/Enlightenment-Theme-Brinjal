@@ -1,0 +1,578 @@
+group { name: "e/modules/cpufreq/main";
+   set { name: "cpu_markers";
+      image { image: "cpu_markers-160.png"  COMP; size: 81 81 99999 99999; }
+      image { image: "cpu_markers-080.png"  COMP; size: 41 41 80 80 99999; }
+      image { image: "cpu_markers-040.png"  COMP; size:  0  0 40 40; }
+   }
+   set { name: "cpu_detail";
+      image { image: "cpu_detail-160.png"  COMP; size: 81 81 99999 99999; }
+      image { image: "cpu_detail-080.png"  COMP; size: 41 41 80 80 99999; }
+      image { image: "cpu_detail-040.png"  COMP; size:  0  0 40 40; }
+   }
+   set { name: "cpu_clip_1";
+      image { image: "cpu_clip_1-160.png"  COMP; size: 81 81 99999 99999; }
+      image { image: "cpu_clip_1-080.png"  COMP; size: 41 41 80 80 99999; }
+      image { image: "cpu_clip_1-040.png"  COMP; size:  0  0 40 40; }
+   }
+   set { name: "cpu_clip_2";
+      image { image: "cpu_clip_2-160.png"  COMP; size: 81 81 99999 99999; }
+      image { image: "cpu_clip_2-080.png"  COMP; size: 41 41 80 80 99999; }
+      image { image: "cpu_clip_2-040.png"  COMP; size:  0  0 40 40; }
+   }
+   set { name: "cpu_clip_3";
+      image { image: "cpu_clip_3-160.png"  COMP; size: 81 81 99999 99999; }
+      image { image: "cpu_clip_3-080.png"  COMP; size: 41 41 80 80 99999; }
+      image { image: "cpu_clip_3-040.png"  COMP; size:  0  0 40 40; }
+   }
+   set { name: "cpu_marker";
+      image { image: "cpu_marker.png"  COMP; size: 72 72 99999 99999; }
+      image { image: "cpu_marker2.png" COMP; size: 36 36 72 72; }
+      image { image: "cpu_marker3.png" COMP; size: 18 18 36 36; }
+      image { image: "cpu_marker4.png" COMP; size: 0 0 4 18; }
+   }
+   script {
+      public available_frequencies;
+      public available_governors;
+
+//      public cur_freq_anim;
+
+      public cur_freq_old;
+      public cur_freq_new;
+      public cur_freq_now;
+
+      public min_freq_old;
+      public min_freq_new;
+      public min_freq_now;
+
+      public max_freq_old;
+      public max_freq_new;
+      public max_freq_now;
+
+      public show_freq(Float:v) {
+         new Float:freq, Float:min_freq, Float:max_freq, Float:tf, Float:fdiff;
+         new f, f0, f1;
+
+         min_freq = fetch_int(available_frequencies, 0);
+         max_freq = fetch_int(available_frequencies,
+                              count(available_frequencies) - 1);
+
+         f0 = get_int(cur_freq_old);
+         f1 = get_int(cur_freq_new);
+         f = f1 - f0;
+         freq = float(f) * v;
+         f = round(freq);
+         f = f + f0;
+         set_int(cur_freq_now, f);
+
+         fdiff = max_freq - min_freq;
+
+         if (fdiff <= 0) { freq = 1.0; }
+         else { freq = (float(f) - min_freq) / (fdiff); }
+         tf = (freq * 225.0) - 135.0;
+         custom_state(PART:"meter", "default", 0.0);
+         set_state_val(PART:"meter", STATE_MAP_ROT_Z, tf);
+         set_state(PART:"meter", "custom", 0.0);
+
+         f0 = get_int(min_freq_old);
+         f1 = get_int(min_freq_new);
+         f = f1 - f0;
+         freq = float(f) * v;
+         f = round(freq);
+         f = f + f0;
+         set_int(min_freq_now, f);
+
+         if (fdiff <= 0) { freq = 1.0; }
+         else { freq = (float(f) - min_freq) / (fdiff); }
+         tf = (freq * 225.0) - 135.0;
+         custom_state(PART:"meter_min", "default", 0.0);
+         set_state_val(PART:"meter_min", STATE_MAP_ROT_Z, tf);
+         set_state(PART:"meter_min", "custom", 0.0);
+
+         f0 = get_int(max_freq_old);
+         f1 = get_int(max_freq_new);
+         f = f1 - f0;
+         freq = float(f) * v;
+         f = round(freq);
+         f = f + f0;
+         set_int(max_freq_now, f);
+
+         if (fdiff <= 0) { freq = 1.0; }
+         else { freq = (float(f) - min_freq) / (fdiff); }
+         tf = (freq * 225.0) - 135.0;
+         custom_state(PART:"meter_max", "default", 0.0);
+         set_state_val(PART:"meter_max", STATE_MAP_ROT_Z, tf);
+         set_state(PART:"meter_max", "custom", 0.0);
+
+      }
+//      public slide_cur_freq(val, Float:v) {
+//         v = (1.0 - cos(v * 3.141592654)) / 2.0;
+//         show_freq(v);
+//         if (v >= 1.0) {
+//            set_int(cur_freq_anim, 0);
+//            return 0;
+//         }
+//         return 1;
+//      }
+
+      public message(Msg_Type:type, id, ...) {
+         if ((type == MSG_INT_SET) && (id == 1)) { // add an available freq
+            while (count(available_frequencies) > 0) {
+               remove(available_frequencies, 0);
+            }
+            for (new i = 2; i < numargs(); i++) {
+               append_int(available_frequencies, getarg(i));
+            }
+         }
+         else if ((type == MSG_STRING_SET) && (id == 2)) { // add a governor
+            new text[100];
+            while (count(available_governors) > 0) {
+               remove(available_governors, 0);
+            }
+            for (new i = 2; i < numargs(); i++) {
+               snprintf(text, 100, "%s", getarg(i));
+               append_str(available_governors, text);
+            }
+         } else if ((type == MSG_INT_SET) && (id == 3)) { // avg freq
+//            new ani;
+            new f, curf, minf, maxf;
+            new text[100];
+
+            f = getarg(2);
+            if (f < 1000000) {
+               f += 500;
+               snprintf(text, 100, "%i", f / 1000);
+            } else {
+               f += 50000;
+               snprintf(text, 100, "%i.%i", f / 1000000,
+                        (f % 1000000) / 100000);
+            }
+            set_text(PART:"readout", text);
+
+            f = getarg(2);
+            curf = get_int(cur_freq_now);
+            set_int(cur_freq_old, curf);
+            set_int(cur_freq_new, f);
+
+            f = getarg(4);
+            minf = get_int(min_freq_now);
+            set_int(min_freq_old, minf);
+            set_int(min_freq_new, f);
+
+            f = getarg(5);
+            maxf = get_int(max_freq_now);
+            set_int(max_freq_old, maxf);
+            set_int(max_freq_new, f);
+
+//            ani = get_int(cur_freq_anim);
+//            if (ani > 0) cancel_anim(ani);
+//            ani = anim(0.2, "slide_cur_freq", 0);
+//            set_int(cur_freq_anim, ani);
+            show_freq(1.0);
+
+         } else if ((type == MSG_STRING) && (id == 4)) {
+            new text[100];
+            snprintf(text, 100, "%s", getarg(2));
+         }
+      }
+   }
+   parts {
+      part { name: "fade_clip"; type: RECT;
+         description { state: "default" 0.0;
+         }
+         description { state: "faded" 0.0;
+            color: 255 255 255 128; // no cc
+         }
+      }
+      part { name: "clip1";
+         clip_to: "fade_clip";
+         description { state: "default" 0.0;
+            rel.to: "base";
+            image.normal: "cpu_clip_1";
+         }
+      }
+      part { name: "clip2";
+         clip_to: "fade_clip";
+         description { state: "default" 0.0;
+            rel.to: "base";
+            image.normal: "cpu_clip_2";
+         }
+      }
+      part { name: "clip3";
+         clip_to: "fade_clip";
+         description { state: "default" 0.0;
+            rel.to: "base";
+            image.normal: "cpu_clip_3";
+         }
+      }
+      part { name: "base";
+         description { state: "default" 0.0;
+            aspect: 1.0 1.0; aspect_preference: BOTH;
+            image.normal: "clock_base";
+            color_class: "/bg/normal/gadgets/cpufreq/base";
+         }
+      }
+      part { name: "base_detail";
+         description { state: "default" 0.0;
+            rel.to: "base";
+            aspect: 1.0 1.0; aspect_preference: BOTH;
+            image.normal: "cpu_detail";
+            color_class: "/bg/normal/gadgets/cpufreq/detail";
+         }
+      }
+      part { name: "base_markers";
+         description { state: "default" 0.0;
+            rel.to: "base";
+            aspect: 1.0 1.0; aspect_preference: BOTH;
+            image.normal: "cpu_markers";
+            color_class: "/fg/normal/gadgets/cpufreq/digits";
+         }
+      }
+      part { name: "readout"; type: TEXT; mouse_events: 0;
+         scale: 1;
+         clip_to: "fade_clip";
+         description { state: "default" 0.0;
+            rel1.relative: (56/144) (56/144);
+            rel2.relative: (88/144) (88/144);
+            color_class: "/fg/normal/gadgets/cpufreq/text";
+            text { font: FN; size: 6;
+               min: 1 1;
+               ellipsis: -1;
+               text_class: "module_small";
+            }
+         }
+      }
+      part { name: "meter_min"; mouse_events: 0;
+         clip_to: "clip3";
+         description { state: "default" 0.0;
+            image.normal: "cpu_marker";
+            color_class: "/fg/normal/gadgets/cpufreq/hands/min";
+            rel.to: "base";
+            map {
+               on: 1;
+               rotation.center: "base";
+            }
+         }
+      }
+      part { name: "meter_max"; mouse_events: 0;
+         clip_to: "clip1";
+         description { state: "default" 0.0;
+            image.normal: "cpu_marker";
+            color_class: "/fg/normal/gadgets/cpufreq/hands/max";
+            rel.to: "base";
+            map {
+               on: 1;
+               rotation.center: "base";
+            }
+         }
+      }
+      part { name: "meter"; mouse_events: 0;
+         clip_to: "clip2";
+         description { state: "default" 0.0000;
+            image.normal: "cpu_marker";
+            color_class: "/fg/normal/gadgets/cpufreq/hands/average";
+            rel.to: "base";
+            map {
+               on: 1;
+               rotation.center: "base";
+            }
+         }
+      }
+   }
+   programs {
+      program { signal: "e,state,enabled"; source: "e";
+         action: STATE_SET "default" 0.0;
+         target: "fade_clip";
+      }
+      program { signal: "e,state,disabled"; source: "e";
+         action: STATE_SET "faded" 0.0;
+         target: "fade_clip";
+      }
+   }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+group { name: "e/modules/cpufreq/gadget";
+  // new gadget with cpu usage swallow
+  parts {
+    part { name: "e.swallow.content"; type: SWALLOW;
+      description { state: "default" 0.0;
+      }
+    }
+    part { name: "e.text.cpu.usage"; type: TEXT; mouse_events: 0;
+      scale: 1;
+      description { state: "default" 0.0;
+        rel2.relative: 1.0 0.5;
+        color_class: "/fg/normal/gadgets/cpufreq/text";
+        text { font: FN; size: 6;
+          align: 0.5 1.0;
+          min: 0 1;
+          ellipsis: -1;
+          text_class: "module_small";
+        }
+      }
+    }
+    part { name: "e.text.cpu.freq"; type: TEXT; mouse_events: 0;
+      scale: 1;
+      description { state: "default" 0.0;
+        rel1.relative: 0.0 0.5;
+        color_class: "/fg/normal/gadgets/cpufreq/text";
+        text { font: FN; size: 6;
+          align: 0.5 0.0;
+          min: 0 1;
+          ellipsis: -1;
+          text_class: "module_small";
+        }
+      }
+    }
+  }
+}
+
+group { name: "e/modules/cpufreq/popup/detail";
+  // new gadget with cpu usage swallow
+  parts {
+    part { name: "bg"; type: RECT;
+      scale: 1;
+      description { state: "default" 0.0;
+        offscale;
+        color_class: "/bg/normal/gadgets/cpufreq/popup/detail/base";
+        rel1.to_y: "cpu_usage_bg";
+        rel1.relative: 0.0 1.0;
+        rel1.offset: 0 4;
+        rel2.to_y: "cpu_freq_bg";
+        rel2.relative: 1.0 0.0;
+        rel2.offset: -1 -5;
+      }
+    }
+    part { name: "e.swallow.content"; type: SWALLOW;
+      description { state: "default" 0.0;
+        rel.to: "bg";
+      }
+    }
+    part { name: "dim"; type: RECT;
+      scale: 1;
+      description { state: "default" 0.0;
+        offscale;
+        rel.to: "bg";
+        rel2.to_x: "text_sizer";
+        rel2.offset: 4 -1;
+        color_class: "/bg/normal/gadgets/cpufreq/popup/detail/text/bg";
+      }
+    }
+    part { name: "text_sizer"; type: TEXT;
+      scale: 1;
+      description { state: "default" 0.0;
+        visible: 0;
+        offscale;
+        rel.to: "bg";
+        rel1.relative: 0.0 1.0;
+        rel1.offset: 4 -5;
+        rel2.relative: 0.0 1.0;
+        rel2.offset: 4 -5;
+        align: 0.0 1.0;
+        text { font: FN; size: 10;
+          text: "99999 Mhz";
+          align: 0.0 1.0;
+          min: 1 1;
+          ellipsis: -1;
+          text_class: "module_normal";
+        }
+      }
+    }
+    part { name: "e.text.cpu.usage.max"; type: TEXT; mouse_events: 0;
+      scale: 1;
+      description { state: "default" 0.0;
+        offscale;
+        rel.to: "bg";
+        rel1.relative: 0.0 0.0;
+        rel1.offset: 4 4;
+        rel2.relative: 0.0 0.0;
+        rel2.offset: 4 4;
+        align: 0.0 0.0;
+        color_class: "/fg/normal/gadgets/cpufreq/popup/detail/usage/text_max";
+        text { font: FN; size: 10;
+          align: 0.0 0.0;
+          min: 1 1;
+          ellipsis: -1;
+          text_class: "module_normal";
+        }
+      }
+    }
+    part { name: "e.text.cpu.usage.avg"; type: TEXT; mouse_events: 0;
+      scale: 1;
+      description { state: "default" 0.0;
+        offscale;
+        rel.to: "bg";
+        rel1.to_y: "e.text.cpu.usage.max";
+        rel1.relative: 0.0 1.0;
+        rel1.offset: 4 4;
+        rel2.to_y: "e.text.cpu.usage.min";
+        rel2.relative: 0.0 0.0;
+        rel2.offset: 4 -5;
+        align: 0.0 0.5;
+        color_class: "/fg/normal/gadgets/cpufreq/popup/detail/usage/text_avg";
+        text { font: FN; size: 10;
+          align: 0.0 0.5;
+          min: 1 1;
+          ellipsis: -1;
+          text_class: "module_normal";
+        }
+      }
+    }
+    part { name: "e.text.cpu.usage.min"; type: TEXT; mouse_events: 0;
+      scale: 1;
+      description { state: "default" 0.0;
+        offscale;
+        rel.to: "bg";
+        rel1.relative: 0.0 0.5;
+        rel1.offset: 4 -5;
+        rel2.relative: 0.0 0.5;
+        rel2.offset: 4 -5;
+        align: 0.0 1.0;
+        color_class: "/fg/normal/gadgets/cpufreq/popup/detail/usage/text_min";
+        text { font: FN; size: 10;
+          align: 0.0 1.0;
+          min: 1 1;
+          ellipsis: -1;
+          text_class: "module_normal";
+        }
+      }
+    }
+    part { name: "e.text.cpu.freq.max"; type: TEXT; mouse_events: 0;
+      scale: 1;
+      description { state: "default" 0.0;
+        offscale;
+        rel.to: "bg";
+        rel1.relative: 0.0 0.5;
+        rel1.offset: 4 4;
+        rel2.relative: 0.0 0.5;
+        rel2.offset: 4 4;
+        align: 0.0 0.0;
+        color_class: "/fg/normal/gadgets/cpufreq/popup/detail/freq/text_max";
+        text { font: FN; size: 10;
+          align: 0.0 0.0;
+          min: 1 1;
+          ellipsis: -1;
+          text_class: "module_normal";
+        }
+      }
+    }
+    part { name: "e.text.cpu.freq.avg"; type: TEXT; mouse_events: 0;
+      scale: 1;
+      description { state: "default" 0.0;
+        offscale;
+        rel.to: "bg";
+        rel1.to_y: "e.text.cpu.freq.max";
+        rel1.relative: 0.0 1.0;
+        rel1.offset: 4 4;
+        rel2.to_y: "e.text.cpu.freq.min";
+        rel2.relative: 0.0 0.0;
+        rel2.offset: 4 -5;
+        align: 0.0 0.5;
+        color_class: "/fg/normal/gadgets/cpufreq/popup/detail/freq/text_avg";
+        text { font: FN; size: 10;
+          align: 0.0 0.5;
+          min: 1 1;
+          ellipsis: -1;
+          text_class: "module_normal";
+        }
+      }
+    }
+    part { name: "e.text.cpu.freq.min"; type: TEXT; mouse_events: 0;
+      scale: 1;
+      description { state: "default" 0.0;
+        offscale;
+        rel.to: "bg";
+        rel1.relative: 0.0 1.0;
+        rel1.offset: 4 -5;
+        rel2.relative: 0.0 1.0;
+        rel2.offset: 4 -5;
+        align: 0.0 1.0;
+        color_class: "/fg/normal/gadgets/cpufreq/popup/detail/freq/text_min";
+        text { font: FN; size: 10;
+          align: 0.0 1.0;
+          min: 1 1;
+          ellipsis: -1;
+          text_class: "module_normal";
+        }
+      }
+    }
+    part { name: "cpu_usage_bg"; type: RECT;
+      scale: 1;
+      description { state: "default" 0.0;
+        color_class: "/bg/normal/gadgets/cpufreq/popup/detail/base";
+        min: 4 4;
+        rel2.relative: 1.0 0.0;
+        align: 0.5 0.0;
+      }
+    }
+    part { name: "cpu_usage"; type: GROUP; mouse_events: 0;
+      source: "e/modules/cpufreq/grad/cpu_usage";
+      description { state: "default" 0.0;
+        rel.to: "cpu_usage_bg";
+      }
+    }
+    part { name: "cpu_freq_bg"; type: RECT;
+      scale: 1;
+      description { state: "default" 0.0;
+        color_class: "/bg/normal/gadgets/cpufreq/popup/detail/base";
+        min: 4 4;
+        rel1.relative: 0.0 1.0;
+        align: 0.5 1.0;
+      }
+    }
+    part { name: "cpu_freq"; type: GROUP; mouse_events: 0;
+      source: "e/modules/cpufreq/grad/cpu_freq";
+      description { state: "default" 0.0;
+        rel.to: "cpu_freq_bg";
+      }
+    }
+  }
+}
+
+#define G(_p, _p0, _p1, _v0, _v1) \
+part { name: "g"_p0".0"; type: RECT; mouse_events: 0; \
+  description { state: "default" 0.0; \
+    color_class: "/fg/normal/gadgets/cpufreq/"_p"/"_p0; \
+    rel1.relative: _v0  0.0; \
+    rel2.relative: _v1  1.0; \
+  } \
+} \
+part { name: "g"_p0".1"; mouse_events: 0; \
+  description { state: "default" 0.0; \
+    rel.to: "g"_p0".0"; \
+    image.normal: "grad_h.png"; \
+    color_class: "/fg/normal/gadgets/cpufreq/"_p"/"_p1; \
+  } \
+}
+
+group { name: "e/modules/cpufreq/grad/cpu_usage";
+  // 0 -> :bg-dark
+  // 1 -> :selected-dim
+  // 2 -> :selected4
+  // 3 -> :selected-alt
+  // 4 -> :fg-light
+  images.image: "grad_h.png" COMP;
+  parts {
+    G("cpu_usage", "0", "1", 0.0 , 0.25)
+    G("cpu_usage", "1", "2", 0.25, 0.50)
+    G("cpu_usage", "2", "3", 0.50, 0.75)
+    G("cpu_usage", "3", "4", 0.75, 1.00)
+  }
+}
+
+group { name: "e/modules/cpufreq/grad/cpu_freq";
+  // :bg-dark
+  // :comment-dim
+  // :comment
+  // :selected6
+  // :light-glow
+  images.image: "grad_h.png" COMP;
+  parts {
+    G("cpu_freq", "0", "1", 0.0 , 0.25)
+    G("cpu_freq", "1", "2", 0.25, 0.50)
+    G("cpu_freq", "2", "3", 0.50, 0.75)
+    G("cpu_freq", "3", "4", 0.75, 1.00)
+  }
+}
+#undef G

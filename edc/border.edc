@@ -1,0 +1,1376 @@
+// Define this to enable a demo title blur
+//#define BLUR_TITLE 1
+// Define this to enable a demo blue behind everythnig - conflicts with title
+//#define BLUR_BEHIND 1
+
+// Some values used if blur is enabled
+#define BLUR_FORCE_ALPHA      160
+#define BLUR_TITLE_AMOUNT     "32"
+#define BLUR_BEHIND_AMOUNT    "32"
+
+group { name: "e/widgets/border/volume";
+   images.image: "shadow_circle_vert.png" COMP;
+   parts {
+      part { name: "base"; type: RECT;
+         description { state: "default" 0.0;
+            color: 0 0 0 0; // no cc
+         }
+      }
+      part { name: "bg"; type: RECT;
+         description { state: "default" 0.0;
+            fixed: 1 1;
+            color: 0 0 0 0; // no cc
+            rel.to: "e.swallow.volume";
+            rel2.to_x: "clip";
+         }
+      }
+      part { name: "clip"; type: RECT;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel.to: "e.swallow.volume";
+            align: 0.0 0.5;
+            max: 0 999999;
+         }
+         description { state: "show" 0.0;
+            rel.to: "e.swallow.volume";
+            max: 999999 999999;
+            rel2.offset: 3 -1;
+            offscale;
+         }
+      }
+      part { name: "e.swallow.volume_icon"; type: SWALLOW;
+         description { state: "default" 0.0;
+            rel.to: "base";
+            rel1.relative: 0.15 0.15;
+            rel2.relative: 0.85 0.85;
+         }
+      }
+      part { name: "e.swallow.volume"; type: SWALLOW;
+         clip_to: "clip";
+         description { state: "default" 0.0;
+            fixed: 1 0;
+            rel1.to_x: "e.swallow.volume_icon";
+            rel1.relative: 1.0 0.0;
+            rel1.offset: 1 0;
+            rel2.to_x: "e.swallow.volume_icon";
+            align: 0.0 0.5;
+         }
+      }
+      part { name: "sh_right"; mouse_events: 0;
+         scale: 1;
+         clip_to: "clip";
+         description { state: "default" 0.0;
+            fixed: 1 1;
+            color_class: "/shadow/normal/border/volume";
+            rel.to_y: "base";
+            rel.to_x: "bg";
+            rel1.relative: 1.0 0.0;
+            rel1.offset: -16 0;
+            rel2.offset: 15 -1;
+            image.normal: "shadow_circle_vert.png";
+            offscale;
+         }
+         description { state: "focused" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/shadow/selected/border/volume";
+         }
+      }
+      part { name: "event"; type: RECT; repeat_events: 1;
+         description { state: "default" 0.0;
+            rel.to: "base";
+            color: 0 0 0 0; // no cc
+         }
+         description { state: "large" 0.0;
+            inherit: "default" 0.0;
+            rel2.to: "e.swallow.volume";
+            rel2.offset: 0 0;
+         }
+      }
+      programs {
+         program { signal: "e,state,focused"; source: "e";
+            action: STATE_SET "focused" 0.0;
+            target: "sh_right";
+         }
+         program { signal: "e,state,unfocused"; source: "e";
+            action: STATE_SET "default" 0.0;
+            target: "sh_right";
+         }
+         program { signal: "mouse,in"; source: "event";
+            action: ACTION_STOP;
+            target: "hide_volume1";
+            target: "hide_volume2";
+            after: "show_volume1";
+         }
+         program { name: "show_volume1";
+            action: STATE_SET "large" 0.0;
+            target: "event";
+            after: "show_volume2";
+         }
+         program { name: "show_volume2";
+            action: STATE_SET "show" 0.0;
+            transition: SINUSOIDAL 0.3 USE_DURATION_FACTOR 1;
+            target: "clip";
+         }
+
+         program { signal: "mouse,out"; source: "event";
+            action: ACTION_STOP;
+            target: "show_volume1";
+            target: "show_volume2";
+            after: "hide_volume1";
+         }
+         program { name: "hide_volume1";
+            action: STATE_SET "default" 0.0;
+            transition: SINUSOIDAL 0.5 USE_DURATION_FACTOR 1;
+            target: "clip";
+            after: "hide_volume2";
+         }
+         program { name: "hide_volume2";
+            action: STATE_SET "default" 0.0;
+            target: "event";
+         }
+      }
+   }
+}
+
+
+
+group { name: "e/widgets/border/default/border";
+   alias: "e/widgets/border/shaped/border";
+
+   IMAGE_RING("ringa", 160)
+   IMAGE_RING("ringb", 160)
+   IMAGE_RING("ringc", 160)
+
+   images.image: "win_shad_flat.png" COMP;
+   data.item: "shadow" "1";
+   parts {
+      part { name: "shadow_clip"; type: RECT; mouse_events: 0;
+         clip_to: "shadow_clip2";
+         description { state: "default";
+            rel.to: "_sh1";
+            color_class: "/shadow/normal/border";
+         }
+         description { state: "focused";
+            inherit: "default";
+            color_class: "/shadow/selected/border";
+         }
+      }
+      part { name: "shadow_clip2"; type: RECT; mouse_events: 0;
+         description { state: "default";
+            rel.to: "shadow_clip";
+         }
+         description { state: "hidden";
+            visible: 0;
+         }
+      }
+      part { name: "shadow_base"; type: SPACER;
+         description { state: "default" 0.0;
+            rel1.to: "top";
+            rel2.to: "bottom";
+         }
+         description { state: "shaded";
+            inherit: "default";
+            rel2.to: "e.swallow.client";
+         }
+      }
+      WIN_SHAD("shadow_base", "shadow_clip", "win_shad_flat.png", 21, 21, 14, 28, 0.5)
+#ifdef BLUR_BEHIND
+      snapshot { name: "title-blur"; mouse_events: 0;
+         description { state: "default" 0.0;
+            rel1.to: "top";
+            rel2.to: "bottom";
+            filter.code: "padding_set { 0 } blur { "BLUR_BEHIND_AMOUNT", color = '#ffff' }";
+         }
+      }
+#endif
+      part { name: "client_clip"; type: RECT; mouse_events: 0;
+         description { state: "default" 0.0;
+            rel1.to_y: "e.swallow.client";
+            rel2.to_y: "e.swallow.client";
+         }
+         description { state: "hidden" 0.0;
+            inherit: "default";
+            visible: 0;
+         }
+      }
+      part { name: "e.swallow.client"; type: SWALLOW;
+         clip_to: "client_clip";
+         description { state: "default" 0.0;
+            rel1.to_y: "top";
+            rel1.relative: 0.0 1.0;
+            rel2.to_y: "bottom";
+            rel2.relative: 1.0 0.0;
+         }
+         description { state: "shaded" 0.0;
+            inherit: "default" 0.0;
+            rel2.relative: 1.0 1.0;
+            rel2.offset: -1 -1;
+         }
+         description { state: "max" 0.0;
+            inherit: "default" 0.0;
+            rel2.relative: 1.0 1.0;
+            rel2.offset: -1 -1;
+         }
+      }
+#ifdef BLUR_TITLE
+      snapshot { name: "title-blur"; mouse_events: 0;
+         description { state: "default" 0.0;
+            rel.to: "top";
+            filter.code: "padding_set { 0 } blur { "BLUR_TITLE_AMOUNT", color = '#ffff' }";
+         }
+      }
+#endif
+      part { name: "top"; type: RECT; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel2.to_y: "e.text.title";
+            rel2.offset: -1 2;
+            color_class: "/bg/normal/titlebar";
+#if defined(BLUR_TITLE) || defined(BLUR_BEHIND)
+            color: 255 255 255 BLUR_FORCE_ALPHA;
+#endif
+            offscale;
+         }
+         description { state: "focused" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/bg/selected/titlebar";
+         }
+      }
+      part { name: "e.text.title"; type: TEXT; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel1.relative: 1.0 0.0;
+            rel1.offset: 1 4;
+            rel1.to_x: "e.swallow.volume";
+            rel2.relative: 0.0 0.0;
+            rel2.offset: -2 4;
+            rel2.to_x: "e.event.minimize";
+            align: 0.5 0.0;
+            color_class: "/fg/normal/titlebar";
+            min: 0 16;
+            text { font: FNBD; size: 10;
+               text_class: "title_bar";
+               align: 0.5 0.0;
+               min: 0 1;
+            }
+            fixed: 0 1;
+            offscale;
+         }
+         description { state: "focused" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/fg/selected/titlebar";
+         }
+      }
+      part { name: "icon"; type: SPACER;
+         description { state: "default" 0.0;
+            rel.to: "e.event.icon";
+         }
+         description { state: "bounce1" 0.0;
+            inherit: "default" 0.0;
+            rel1.relative: 0.5 0.5;
+            rel2.relative: 0.5 0.5;
+         }
+         description { state: "bounce2" 0.0;
+            inherit: "default" 0.0;
+            rel1.relative: -0.5 -0.5;
+            rel2.relative: 1.2 1.2;
+         }
+      }
+      part { name: "e.swallow.icon"; type: SWALLOW; mouse_events: 0;
+         description { state: "default" 0.0;
+            rel.to: "icon";
+            rel1.relative: 0.15 0.15;
+            rel2.relative: 0.85 0.85;
+            rel2.offset: 0 0;
+         }
+      }
+      part { name: "busy_area"; type: SPACER;
+         description { state: "default" 0.0;
+            aspect: 1.0 1.0; aspect_preference: VERTICAL;
+            max: 160 160;
+            rel1.relative: -0.2 -0.2;
+            rel1.to: "e.event.icon";
+            rel2.relative: 1.2 1.2;
+            rel2.to: "e.event.icon";
+            fixed: 1 1;
+         }
+      }
+      BUSY("busy_area", "e,state,hung", "e", "e,state,unhung", "e")
+      part { name: "clip1"; type: RECT; mouse_events: 0;
+         description { state: "default" 0.0;
+            rel.to: "top";
+         }
+         description { state: "focused" 0.0;
+            inherit: "default" 0.0;
+            visible: 0;
+         }
+      }
+      part { name: "clip2"; type: RECT; mouse_events: 0;
+         description { state: "default" 0.0;
+            rel.to: "top";
+            visible: 0;
+         }
+         description { state: "focused" 0.0;
+            inherit: "default" 0.0;
+            visible: 1;
+         }
+      }
+      part { name: "close1";  mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            image.normal: "i-close";
+            rel.to: "e.event.close";
+            min: 15 15; max: 15 15;
+            fixed: 1 1;
+            color_class: "/fg/normal/titlebar/buttons/close";
+         }
+         description { state: "selected" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/fg/selected/titlebar/buttons/close";
+         }
+      }
+      part { name: "max1"; mouse_events: 0;
+         clip_to: "clip1";
+         scale: 1;
+         description { state: "default" 0.0;
+            image.normal: "i-arrow-u";
+            rel.to: "e.event.maximize";
+            min: 15 15; max: 15 15;
+            fixed: 1 1;
+            color_class: "/fg/normal/titlebar/buttons/maximize";
+         }
+         description { state: "selected" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/fg/selected/titlebar/buttons/maximize";
+         }
+      }
+      part { name: "min1"; mouse_events: 0;
+         clip_to: "clip1";
+         scale: 1;
+         description { state: "default" 0.0;
+            image.normal: "i-arrow-d";
+            rel.to: "e.event.minimize";
+            min: 15 15; max: 15 15;
+            fixed: 1 1;
+            color_class: "/fg/normal/titlebar/buttons/minimize";
+         }
+         description { state: "selected" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/fg/selected/titlebar/buttons/minimize";
+         }
+      }
+      part { name: "close2"; mouse_events: 0;
+         clip_to: "clip2";
+         scale: 1;
+         description { state: "default" 0.0;
+            image.normal: "i-close";
+            rel.to: "e.event.close";
+            min: 15 15; max: 15 15;
+            fixed: 1 1;
+            color_class: "/fg/selected/titlebar/buttons/close";
+         }
+         description { state: "selected" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/fg/selected-pressed/titlebar/buttons/close";
+         }
+      }
+      part { name: "max2"; mouse_events: 0;
+         clip_to: "clip2";
+         scale: 1;
+         description { state: "default" 0.0;
+            image.normal: "i-arrow-u";
+            rel.to: "e.event.maximize";
+            min: 15 15; max: 15 15;
+            fixed: 1 1;
+            color_class: "/fg/selected/titlebar/buttons/maximize";
+         }
+         description { state: "selected" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/fg/selected-pressed/titlebar/buttons/maximize";
+         }
+      }
+      part { name: "min2"; mouse_events: 0;
+         clip_to: "clip2";
+         scale: 1;
+         description { state: "default" 0.0;
+            image.normal: "i-arrow-d";
+            rel.to: "e.event.minimize";
+            min: 15 15; max: 15 15;
+            fixed: 1 1;
+            color_class: "/fg/selected/titlebar/buttons/minimize";
+         }
+         description { state: "selected" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/fg/selected-pressed/titlebar/buttons/minimize";
+          }
+      }
+      part { name: "e.event.titlebar"; type: RECT;
+         description { rel.to: "top";
+            color: 0 0 0 0; // no cc
+         }
+      }
+      part { name: "e.event.icon"; type: RECT;
+         description { state: "default" 0.0;
+            fixed: 1 0;
+            rel1.relative: 0.0 0.0;
+            rel2.relative: 0.0 1.0;
+            rel2.to_y: "top";
+            align: 0.0 0.5;
+            aspect: 1.0 1.0; aspect_preference: VERTICAL;
+            color: 0 0 0 0; // no cc
+         }
+      }
+      part { name: "e.event.close"; type: RECT;
+         description { state: "default" 0.0;
+            fixed: 1 0;
+            rel1.relative: 1.0 0.0;
+            rel2.relative: 1.0 1.0;
+            rel2.to_y: "top";
+            align: 1.0 0.5;
+            aspect: 1.0 1.0; aspect_preference: VERTICAL;
+            color: 0 0 0 0; // no cc
+         }
+      }
+      part { name: "e.event.maximize"; type: RECT;
+         description { state: "default" 0.0;
+            rel1.relative: -0.25 0.0;
+            rel1.offset: -1 0;
+            rel1.to_x: "e.event.close";
+            rel2.relative: -0.25 1.0;
+            rel2.to_y: "top";
+            rel2.to_x: "e.event.close";
+            align: 1.0 0.5;
+            aspect: 1.0 1.0; aspect_preference: VERTICAL;
+            color: 0 0 0 0; // no cc
+         }
+      }
+      part { name: "e.event.minimize"; type: RECT;
+         description { state: "default" 0.0;
+            rel1.relative: 0.0 0.0;
+            rel1.offset: -1 0;
+            rel1.to_x: "e.event.maximize";
+            rel2.relative: 0.0 1.0;
+            rel2.to_y: "top";
+            rel2.to_x: "e.event.maximize";
+            align: 1.0 0.5;
+            aspect: 1.0 1.0; aspect_preference: VERTICAL;
+            color: 0 0 0 0; // no cc
+         }
+      }
+      part { name: "e.event.resize.tl"; type: RECT;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel.to: "top";
+            rel2.relative: 0.0 0.0;
+            rel2.offset: 31 3;
+            min: RSZMINW RSZMINH;
+            align: 1.0 1.0;
+            color: RSZCOL; // no cc
+            fixed: 1 1;
+            offscale;
+         }
+      }
+      part { name: "e.event.resize.t"; type: RECT;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel1.relative: 1.0 0.0;
+            rel1.to: "e.event.resize.tl";
+            rel2.relative: 0.0 1.0;
+            rel2.to: "e.event.resize.tr";
+            min: 0 RSZMINH;
+            align: 0.5 1.0;
+            color: RSZCOL2; // no cc
+            fixed: 1 1;
+         }
+      }
+      part { name: "e.event.resize.tr"; type: RECT;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel.to: "top";
+            rel1.relative: 1.0 0.0;
+            rel1.offset: -32 0;
+            rel2.relative: 1.0 0.0;
+            rel2.offset: -1 3;
+            min: RSZMINW RSZMINH;
+            align: 0.0 1.0;
+            color: RSZCOL; // no cc
+            fixed: 1 1;
+            offscale;
+         }
+      }
+      part { name: "bottom"; type: RECT; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel1.relative: 0.0 1.0;
+            rel2.relative: 1.0 1.0;
+            align: 0.5 1.0;
+            min: 0 5;
+            fixed: 0 1;
+            offscale;
+         }
+         description { state: "shaded" 0.0;
+            inherit: "default" 0.0;
+            min: 0 0;
+            visible: 0;
+         }
+         description { state: "max" 0.0;
+            inherit: "default" 0.0;
+            min: 0 0;
+            visible: 0;
+         }
+      }
+      part { name: "bottom_bar"; type: RECT; mouse_events: 0;
+         clip_to: "bottom";
+         description { state: "default" 0.0;
+            color_class: "/bg/normal/border";
+            rel.to: "bottom";
+#if defined(BLUR_BEHIND)
+            color: 255 255 255 BLUR_FORCE_ALPHA;
+#endif
+         }
+         description { state: "focused" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/bg/selected/border";
+         }
+      }
+      part { name: "e.event.resize.bl"; type: RECT;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel.to: "bottom";
+            rel2.relative: 0.0 1.0;
+            rel2.offset: 31 -1;
+            min: RSZMINW RSZMINH;
+            align: 1.0 0.0;
+            color: RSZCOL; // no cc
+            fixed: 1 1;
+            offscale;
+         }
+         description { state: "shaded" 0.0;
+            inherit: "default" 0.0;
+            min: 0 0;
+            visible: 0;
+         }
+         description { state: "max" 0.0;
+            inherit: "default" 0.0;
+            min: 0 0;
+            visible: 0;
+         }
+      }
+      part { name: "e.event.resize.b"; type: RECT;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel1.to: "e.event.resize.bl";
+            rel1.relative: 1.0 0.0;
+            rel2.to: "e.event.resize.br";
+            rel2.relative: 0.0 1.0;
+            min: 0 RSZMINH;
+            align: 0.5 0.0;
+            color: RSZCOL2; // no cc
+            fixed: 1 1;
+            offscale;
+         }
+         description { state: "shaded" 0.0;
+            inherit: "default" 0.0;
+            min: 0 0;
+            visible: 0;
+         }
+         description { state: "max" 0.0;
+            inherit: "default" 0.0;
+            min: 0 0;
+            visible: 0;
+         }
+      }
+      part { name: "e.event.resize.br"; type: RECT;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel.to: "bottom";
+            rel1.relative: 1.0 0.0;
+            rel1.offset: -32 0;
+            min: RSZMINW RSZMINH;
+            align: 0.0 0.0;
+            color: RSZCOL; // no cc
+            fixed: 1 1;
+            offscale;
+         }
+         description { state: "shaded" 0.0;
+            inherit: "default" 0.0;
+            min: 0 0;
+            visible: 0;
+         }
+         description { state: "max" 0.0;
+            inherit: "default" 0.0;
+            min: 0 0;
+            visible: 0;
+         }
+      }
+      part { name: "procstats"; type: RECT;
+         mouse_events: 0;
+         description { state: "default" 0.0;
+            rel1.to_x: "e.procstats.swallow";
+            rel2.to_x: "e.procstats.swallow";
+            rel1.to_y: "top";
+            rel2.to_y: "top";
+            color:  0 0 0 0; // no cc
+            visible: 0;
+         }
+         description { state: "visible";
+            inherit: "default" 0.0;
+            visible: 1;
+         }
+      }
+      part { name: "e.procstats.swallow"; type: SWALLOW;
+         scale: 1;
+         repeat_events: 1;
+         description { state: "default" 0.0;
+            fixed: 1 0;
+            rel.to: "e.event.icon";
+            rel1.relative: 1.0 0.0;
+            rel2.relative: 1.0 1.0;
+            rel2.offset: 0 -1;
+            align: 0.0 0.5;
+            visible: 0;
+         }
+         description { state: "visible";
+            inherit: "default" 0.0;
+            visible: 1;
+         }
+      }
+      part { name: "e.swallow.volume"; type: SWALLOW;
+         source: "e/widgets/border/volume";
+         description { state: "default" 0.0;
+            fixed: 1 0;
+            rel1.to_x: "e.event.icon";
+            rel2.to_x: "e.event.icon";
+            rel1.to_y: "top";
+            rel2.to_y: "top";
+            rel1.relative: 1.0 0.0;
+            rel2.relative: 1.0 1.0;
+            rel2.offset: 0 -1;
+            align: 0.0 0.5;
+            aspect: 1.0 1.0; aspect_preference: VERTICAL;
+         }
+         description { state: "visible";
+            inherit: "default" 0.0;
+            rel.to_x: "e.procstats.swallow";
+         }
+      }
+   }
+   programs {
+      program { signal: "e,version,22"; source: "e";
+         script {
+            set_pointer_mode(PART:"e.event.titlebar", 1);
+            set_pointer_mode(PART:"e.event.resize.tl", 1);
+            set_pointer_mode(PART:"e.event.resize.t", 1);
+            set_pointer_mode(PART:"e.event.resize.tr", 1);
+            set_pointer_mode(PART:"e.event.resize.bl", 1);
+            set_pointer_mode(PART:"e.event.resize.b", 1);
+            set_pointer_mode(PART:"e.event.resize.br", 1);
+         }
+      }
+      program { signal: "e,state,shadow,on"; source: "e";
+         action: STATE_SET "default" 0.0;
+         target: "shadow_clip2";
+      }
+      program { signal: "e,state,shadow,off"; source: "e";
+         action: STATE_SET "hidden" 0.0;
+         target: "shadow_clip2";
+      }
+      program { signal: "e,state,focused"; source: "e";
+         action: STATE_SET "focused" 0.0;
+         target: "top";
+         target: "bottom_bar";
+         target: "shadow_clip";
+         target: "e.text.title";
+         target: "clip1";
+         target: "clip2";
+      }
+      program { signal: "e,state,unfocused"; source: "e";
+         action: STATE_SET "default" 0.0;
+         target: "top";
+         target: "bottom_bar";
+         target: "shadow_clip";
+         target: "e.text.title";
+         target: "clip1";
+         target: "clip2";
+      }
+      program { signal: "e,state,urgent"; source: "e";
+         action: STATE_SET "bounce1" 0.0;
+         target: "icon";
+         after: "urg1";
+      }
+      program { name: "urg1";
+         action: STATE_SET "bounce2" 0.0;
+         transition: DECELERATE 0.4 USE_DURATION_FACTOR 1;
+         target: "icon";
+         after: "urg2";
+      }
+      program { name: "urg2";
+         action: STATE_SET "bounce1" 0.0;
+         transition: ACCELERATE 0.3 USE_DURATION_FACTOR 1;
+         target: "icon";
+         after: "urg1";
+      }
+      program { signal: "e,state,not_urgent"; source: "e";
+         action: STATE_SET "default" 0.0;
+         target: "icon";
+      }
+      program { signal: "e,state,shaded"; source: "e";
+         action: STATE_SET "shaded" 0.0;
+         target: "shadow_base";
+         after: "shading";
+      }
+      program { name: "shading";
+         signal: "e,state,shading"; source: "e";
+         action: STATE_SET "shaded" 0.0;
+         target: "e.swallow.client";
+         target: "bottom";
+         target: "e.event.resize.bl";
+         target: "e.event.resize.b";
+         target: "e.event.resize.br";
+      }
+      program { signal: "e,state,unshaded"; source: "e";
+         action: STATE_SET "default" 0.0;
+         target: "bottom";
+         target: "e.event.resize.bl";
+         target: "e.event.resize.b";
+         target: "e.event.resize.br";
+         target: "client_clip";
+         after: "unshading";
+      }
+      program { name: "unshading";
+         signal: "e,state,unshading"; source: "e";
+         action: STATE_SET "default" 0.0;
+         target: "e.swallow.client";
+         target: "shadow_base";
+         target: "client_clip";
+      }
+      program { signal: "e,state,procstats,on"; source: "e";
+         action: STATE_SET "visible" 0.0;
+         target: "e.procstats.swallow";
+         target: "e.swallow.volume";
+         target: "procstats";
+      }
+      program { signal: "e,state,procstats,off"; source: "e";
+         action: STATE_SET "default" 0.0;
+         target: "e.procstats.swallow";
+         target: "e.swallow.volume";
+         target: "procstats";
+      }
+//      program {
+//         signal: "e,action,maximize"; source: "e";
+//      }
+//      program {
+//         signal: "e,action,unmaximize"; source: "e";
+//      }
+//      program {
+//         signal: "e,action,maximize,fullscreen"; source: "e";
+//      }
+//      program {
+//         signal: "e,action,unmaximize,fullscreen"; source: "e";
+//      }
+      program { signal: "e,action,maximize*"; source: "e";
+         action: STATE_SET "max" 0.0;
+         target: "e.swallow.client";
+         target: "bottom";
+         target: "e.event.resize.bl";
+         target: "e.event.resize.b";
+         target: "e.event.resize.br";
+      }
+      program { signal: "e,action,unmaximize*"; source: "e";
+         action: STATE_SET "default" 0.0;
+         target: "e.swallow.client";
+         target: "bottom";
+         target: "e.event.resize.bl";
+         target: "e.event.resize.b";
+         target: "e.event.resize.br";
+      }
+      program { signal: "mouse,down,*"; source: "e.event.close";
+         action: STATE_SET "selected" 0.0;
+         target: "close1";
+         target: "close2";
+      }
+      program { signal: "mouse,up,*"; source: "e.event.close";
+         action: STATE_SET "default" 0.0;
+         target: "close1";
+         target: "close2";
+      }
+      program { signal: "mouse,down,*"; source: "e.event.maximize";
+         action: STATE_SET "selected" 0.0;
+         target: "max1";
+         target: "max2";
+      }
+      program { signal: "mouse,up,*"; source: "e.event.maximize";
+         action: STATE_SET "default" 0.0;
+         target: "max1";
+         target: "max2";
+      }
+      program { signal: "mouse,down,*"; source: "e.event.minimize";
+         action: STATE_SET "selected" 0.0;
+         target: "min1";
+         target: "min2";
+      }
+      program { signal: "mouse,up,*"; source: "e.event.minimize";
+         action: STATE_SET "default" 0.0;
+         target: "min1";
+         target: "min2";
+      }
+   }
+}
+
+group { name: "e/widgets/border/dialog/border";
+   alias: "e/widgets/border/modal/border";
+   inherit: "e/widgets/border/default/border";
+   parts {
+      part { name: "max1";
+         description { state: "default" 0.0;
+            min: 0 0;
+            max: 0 0;
+            visible: 0;
+         }
+         description { state: "selected" 0.0;
+            min: 0 0;
+            max: 0 0;
+            visible: 0;
+         }
+      }
+      part { name: "min1";
+         description { state: "default" 0.0;
+            min: 0 0;
+            max: 0 0;
+            visible: 0;
+         }
+         description { state: "selected" 0.0;
+            min: 0 0;
+            max: 0 0;
+            visible: 0;
+         }
+      }
+      part { name: "max2";
+         description { state: "default" 0.0;
+            min: 0 0;
+            max: 0 0;
+            visible: 0;
+         }
+         description { state: "selected" 0.0;
+            min: 0 0;
+            max: 0 0;
+            visible: 0;
+         }
+      }
+      part { name: "min2";
+         description { state: "default" 0.0;
+            min: 0 0;
+            max: 0 0;
+            visible: 0;
+         }
+         description { state: "selected" 0.0;
+            min: 0 0;
+            max: 0 0;
+            visible: 0;
+         }
+      }
+      part { name: "e.event.titlebar";
+         description { state: "default" 0.0;
+            rel2.to_x: "e.event.close";
+         }
+      }
+      part { name: "e.event.maximize";
+         description { state: "default" 0.0;
+            max: 0 0;
+            aspect: 0.0 0.0;
+            visible: 0;
+            fixed: 1 1;
+         }
+      }
+      part { name: "e.event.minimize";
+         description { state: "default" 0.0;
+            max: 0 0;
+            aspect: 0.0 0.0;
+            visible: 0;
+            fixed: 1 1;
+         }
+      }
+   }
+}
+
+group { name: "e/widgets/border/noresize/border";
+   inherit: "e/widgets/border/default/border";
+   parts {
+      part { name: "e.swallow.client"; type: SWALLOW;
+         description { state: "default" 0.0;
+            rel2.relative: 1.0 1.0;
+         }
+      }
+      part { name: "bottom"; type: RECT;
+         description { state: "default" 0.0;
+            rel1.relative: 0.0 1.0;
+            rel1.offset: 0 -1;
+            rel2.relative: 1.0 1.0;
+            min: 0 0;
+            fixed: 0 1;
+            visible: 0;
+         }
+      }
+      part { name: "e.event.resize.bl";
+         description { state: "default" 0.0;
+            min: 0 0;
+            visible: 0;
+         }
+      }
+      part { name: "e.event.resize.b";
+         description { state: "default" 0.0;
+            min: 0 0;
+            visible: 0;
+         }
+      }
+      part { name: "e.event.resize.br";
+         description { state: "default" 0.0;
+            min: 0 0;
+            visible: 0;
+         }
+      }
+   }
+}
+
+group { name: "e/widgets/border/noresize_dialog/border";
+   inherit: "e/widgets/border/dialog/border";
+   parts {
+      part { name: "e.swallow.client"; type: SWALLOW;
+         description { state: "default" 0.0;
+            rel2.relative: 1.0 1.0;
+         }
+      }
+      part { name: "bottom"; type: RECT;
+         description { state: "default" 0.0;
+            rel1.relative: 0.0 1.0;
+            rel1.offset: 0 -1;
+            rel2.relative: 1.0 1.0;
+            min: 0 0;
+            fixed: 0 1;
+            visible: 0;
+         }
+      }
+      part { name: "e.event.resize.bl";
+         description { state: "default" 0.0;
+            min: 0 0;
+            visible: 0;
+         }
+      }
+      part { name: "e.event.resize.b";
+         description { state: "default" 0.0;
+            min: 0 0;
+            visible: 0;
+         }
+      }
+      part { name: "e.event.resize.br";
+         description { state: "default" 0.0;
+            min: 0 0;
+            visible: 0;
+         }
+      }
+   }
+}
+
+group { name: "e/widgets/border/pixel/border";
+   parts {
+      part { name: "client_clip"; type: RECT; mouse_events: 0;
+         description { state: "default" 0.0;
+            rel1.to_y: "e.swallow.client";
+            rel2.to_y: "e.swallow.client";
+         }
+      }
+      part { name: "e.swallow.client"; type: SWALLOW;
+         clip_to: "client_clip";
+         description { state: "default" 0.0;
+            rel1.offset: 1 1;
+            rel2.offset: -2 -2;
+         }
+      }
+      part { name: "top"; type: RECT;
+         description { state: "default" 0.0;
+            color_class: "/bg/normal/border/outline";
+            align: 0.0 0.0;
+            max: 99999 1;
+         }
+         description { state: "focused" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/bg/selected/border/outline";
+         }
+      }
+      part { name: "bottom"; type: RECT;
+         description { state: "default" 0.0;
+            color_class: "/bg/normal/border/outline";
+            align: 0.0 1.0;
+            max: 99999 1;
+         }
+         description { state: "focused" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/bg/selected/border/outline";
+         }
+      }
+      part { name: "left"; type: RECT;
+         description { state: "default" 0.0;
+            color_class: "/bg/normal/border/outline";
+            align: 0.0 0.0;
+            max: 1 99999;
+         }
+         description { state: "focused" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/bg/selected/border/outline";
+         }
+      }
+      part { name: "right"; type: RECT;
+         description { state: "default" 0.0;
+            color_class: "/bg/normal/border/outline";
+            align: 1.0 0.0;
+            max: 1 99999;
+         }
+         description { state: "focused" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/bg/selected/border/outline";
+         }
+      }
+      part { name: "e.event.resize.tl"; type: RECT;
+         description { state: "default" 0.0;
+            rel2.relative: 0.0 0.0;
+            min: 32 4;
+            align: 0.0 0.0;
+            color: 0 0 0 0; // no cc
+         }
+      }
+      part { name: "e.event.resize.t"; type: RECT;
+         description { state: "default" 0.0;
+            rel1.relative: 1.0 0.0;
+            rel1.to_x: "e.event.resize.tl";
+            rel2.relative: 0.0 0.0;
+            rel2.to_x: "e.event.resize.tr";
+            min: 0 4;
+            align: 0.5 0.0;
+            color: 0 0 0 0; // no cc
+         }
+      }
+      part { name: "e.event.resize.tr"; type: RECT;
+         description { state: "default" 0.0;
+            rel1.relative: 1.0 0.0;
+            rel2.relative: 1.0 0.0;
+            min: 32 4;
+            align: 1.0 0.0;
+            color: 0 0 0 0; // no cc
+         }
+      }
+      part { name: "e.event.resize.bl"; type: RECT;
+         description { state: "default" 0.0;
+            rel1.relative: 0.0 1.0;
+            rel2.relative: 0.0 1.0;
+            min: 32 5;
+            align: 0.0 1.0;
+            color: 0 0 0 0; // no cc
+            fixed: 1 1;
+         }
+      }
+      part { name: "e.event.resize.b"; type: RECT;
+         description { state: "default" 0.0;
+            rel1.relative: 1.0 1.0;
+            rel1.to_x: "e.event.resize.tl";
+            rel2.relative: 0.0 1.0;
+            rel2.to_x: "e.event.resize.tr";
+            min: 0 5;
+            align: 0.5 1.0;
+            color: 0 0 0 0; // no cc
+            fixed: 0 1;
+         }
+      }
+      part { name: "e.event.resize.br"; type: RECT;
+         description { state: "default" 0.0;
+            rel1.relative: 1.0 1.0;
+            rel2.relative: 1.0 1.0;
+            min: 32 5;
+            align: 1.0 1.0;
+            color: 0 0 0 0; // no cc
+            fixed: 1 1;
+         }
+      }
+   }
+   programs {
+      program { signal: "e,state,focused"; source: "e";
+         action: STATE_SET "focused" 0.0;
+         target: "top";
+         target: "bottom";
+         target: "left";
+         target: "right";
+      }
+      program { signal: "e,state,unfocused"; source: "e";
+         action: STATE_SET "default" 0.0;
+         target: "top";
+         target: "bottom";
+         target: "left";
+         target: "right";
+      }
+   }
+}
+
+group { name: "e/widgets/border/tiling/border";
+   images.image: "win_shad_flat.png" COMP;
+   data.item: "shadow" "1";
+   parts {
+      part { name: "shadow_clip"; type: RECT; mouse_events: 0;
+         clip_to: "shadow_clip2";
+         description { state: "default";
+            rel.to: "_sh1";
+            color_class: "/shadow/normal/border";
+         }
+         description { state: "focused";
+            inherit: "default";
+            color_class: "/shadow/selected/border";
+         }
+      }
+      part { name: "shadow_clip2"; type: RECT; mouse_events: 0;
+         description { state: "default";
+            rel.to: "shadow_clip";
+         }
+         description { state: "hidden";
+            visible: 0;
+         }
+      }
+      part { name: "shadow_base"; type: SPACER;
+         description { state: "default" 0.0;
+            rel1.to: "top";
+            rel2.to: "bottom";
+         }
+         description { state: "shaded";
+            inherit: "default";
+            rel2.to: "e.swallow.client";
+         }
+      }
+      WIN_SHAD("shadow_base", "shadow_clip", "win_shad_flat.png", 21, 21, 14, 28, 0.5)
+      part { name: "client_clip"; type: RECT; mouse_events: 0;
+         description { state: "default" 0.0;
+            rel1.to_y: "e.swallow.client";
+            rel2.to_y: "e.swallow.client";
+         }
+      }
+      part { name: "e.swallow.client"; type: SWALLOW;
+         clip_to: "client_clip";
+         description { state: "default" 0.0;
+         }
+      }
+      part { name: "top"; type: RECT;
+         description { state: "default" 0.0;
+            color_class: "/bg/selected/border/outline";
+            color: 0 0 0 0; // no cc
+            align: 0.0 0.0;
+            rel1.offset: -1 -1;
+            rel2.offset: 0 0;
+            max: 99999 1;
+         }
+         description { state: "focused" 0.0;
+            inherit: "default" 0.0;
+            color: 255 255 255 255; // no cc
+         }
+      }
+      part { name: "bottom"; type: RECT;
+         description { state: "default" 0.0;
+            color_class: "/bg/selected/border/outline";
+            color: 0 0 0 0; // no cc
+            align: 0.0 1.0;
+            rel1.offset: -1 -1;
+            rel2.offset: 0 0;
+            max: 99999 1;
+         }
+         description { state: "focused" 0.0;
+            inherit: "default" 0.0;
+            color: 255 255 255 255; // no cc
+         }
+      }
+      part { name: "left"; type: RECT;
+         description { state: "default" 0.0;
+            color_class: "/bg/selected/border/outline";
+            color: 0 0 0 0; // no cc
+            align: 0.0 0.0;
+            rel1.offset: -1 -1;
+            rel2.offset: 0 0;
+            max: 1 99999;
+         }
+         description { state: "focused" 0.0;
+            inherit: "default" 0.0;
+            color: 255 255 255 255; // no cc
+         }
+      }
+      part { name: "right"; type: RECT;
+         description { state: "default" 0.0;
+            color_class: "/bg/selected/border/outline";
+            color: 0 0 0 0; // no cc
+            align: 1.0 0.0;
+            rel1.offset: -1 -1;
+            rel2.offset: 0 0;
+            max: 1 99999;
+         }
+         description { state: "focused" 0.0;
+            inherit: "default" 0.0;
+            color: 255 255 255 255; // no cc
+         }
+      }
+      part { name: "e.event.resize.tl"; type: RECT;
+         description { state: "default" 0.0;
+            rel2.relative: 0.0 0.0;
+            min: 32 4;
+            rel1.offset: -1 -1;
+            rel2.offset: 0 0;
+            align: 0.0 0.0;
+            color: 0 0 0 0; // no cc
+         }
+      }
+      part { name: "e.event.resize.t"; type: RECT;
+         description { state: "default" 0.0;
+            rel1.relative: 1.0 0.0;
+            rel1.to_x: "e.event.resize.tl";
+            rel2.relative: 0.0 0.0;
+            rel2.to_x: "e.event.resize.tr";
+            rel1.offset: -1 -1;
+            rel2.offset: 0 0;
+            min: 0 4;
+            align: 0.5 0.0;
+            color: 0 0 0 0; // no cc
+         }
+      }
+      part { name: "e.event.resize.tr"; type: RECT;
+         description { state: "default" 0.0;
+            rel1.relative: 1.0 0.0;
+            rel2.relative: 1.0 0.0;
+            min: 32 4;
+            rel1.offset: -1 -1;
+            rel2.offset: 0 0;
+            align: 1.0 0.0;
+            color: 0 0 0 0; // no cc
+         }
+      }
+      part { name: "e.event.resize.bl"; type: RECT;
+         description { state: "default" 0.0;
+            rel1.relative: 0.0 1.0;
+            rel2.relative: 0.0 1.0;
+            min: 32 5;
+            rel1.offset: -1 -1;
+            rel2.offset: 0 0;
+            align: 0.0 1.0;
+            color: 0 0 0 0; // no cc
+            fixed: 1 1;
+         }
+      }
+      part { name: "e.event.resize.b"; type: RECT;
+         description { state: "default" 0.0;
+            rel1.relative: 1.0 1.0;
+            rel1.to_x: "e.event.resize.tl";
+            rel2.relative: 0.0 1.0;
+            rel2.to_x: "e.event.resize.tr";
+            rel1.offset: -1 -1;
+            rel2.offset: 0 0;
+            min: 0 5;
+            align: 0.5 1.0;
+            color: 0 0 0 0; // no cc
+            fixed: 0 1;
+         }
+      }
+      part { name: "e.event.resize.br"; type: RECT;
+         description { state: "default" 0.0;
+            rel1.relative: 1.0 1.0;
+            rel2.relative: 1.0 1.0;
+            rel1.offset: -1 -1;
+            rel2.offset: 0 0;
+            min: 32 5;
+            align: 1.0 1.0;
+            color: 0 0 0 0; // no cc
+            fixed: 1 1;
+         }
+      }
+   }
+   programs {
+      program { signal: "e,state,shadow,on"; source: "e";
+         action: STATE_SET "default" 0.0;
+         target: "shadow_clip2";
+      }
+      program { signal: "e,state,shadow,off"; source: "e";
+         action: STATE_SET "hidden" 0.0;
+         target: "shadow_clip2";
+      }
+      program { signal: "e,state,focused"; source: "e";
+         action: STATE_SET "focused" 0.0;
+         target: "top";
+         target: "bottom";
+         target: "left";
+         target: "right";
+         target: "shadow_clip";
+      }
+      program { signal: "e,state,unfocused"; source: "e";
+         action: STATE_SET "default" 0.0;
+         target: "top";
+         target: "bottom";
+         target: "left";
+         target: "right";
+         target: "shadow_clip";
+      }
+   }
+}
+
+group { name: "e/widgets/border/default/move";
+   parts {
+      part { name: "bg"; type: RECT; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            color_class: "/bg/normal/border/move";
+            min: 120 38;
+         }
+      }
+      part { name: "icon";
+         scale: 1;
+         description { state: "default" 0.0;
+            align: 0.0 0.5;
+            fixed: 1 1;
+            FIXED_SIZE(30, 30)
+            rel1.offset: 4 4;
+            rel2.relative: 0.0 1.0;
+            rel2.offset: 4 -5;
+            image.normal: "i-move";
+            color_class: "/fg/normal/border/move";
+            offscale;
+         }
+      }
+      part { name: "e.text.label"; type: TEXT;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel1.relative: 1.0 0.0;
+            rel1.to_x: "icon";
+            rel1.offset: 4 4;
+            rel2.offset: -5 -5;
+            color_class: "/fg/normal/border/move";
+            offscale;
+            text { font: FN; size: 10;
+               min: 1 1;
+               ellipsis: -1;
+               text_class: "move_text";
+            }
+         }
+      }
+   }
+}
+
+group { name: "e/widgets/border/default/resize";
+   inherit: "e/widgets/border/default/move";
+   parts {
+      part { name: "bg";
+         description { state: "default" 0.0;
+            color_class: "/bg/normal/border/resize";
+         }
+      }
+      part { name: "icon";
+         description { state: "default" 0.0;
+            image.normal: "i-resize";
+            color_class: "/fg/normal/border/resize";
+         }
+      }
+      part { name: "e.text.label";
+         description { state: "default" 0.0;
+            color_class: "/fg/normal/border/resize";
+         }
+      }
+   }
+}

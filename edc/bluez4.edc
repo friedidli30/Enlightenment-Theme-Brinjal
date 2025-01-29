@@ -1,0 +1,31 @@
+group { name: "e/modules/bluez4/main";
+   images.image: "bz5_logo.png" COMP;
+   max: 160 160;
+   parts {
+      part { name: "base";
+         description { state: "default" 0.0;
+            rel1.relative: (25/380) (25/380);
+            rel2.relative: (365/380) (365/380);
+            aspect: 1.0 1.0; aspect_preference: BOTH;
+            image.normal: "bz5_logo.png";
+            color_class: "/fg/normal/gadgets/bluez/on";
+         }
+      }
+   }
+}
+
+group { name: "e/modules/bluez4/inactive";
+   images.image: "bz5_logo.png" COMP;
+   max: 160 160;
+   parts {
+      part { name: "base";
+         description { state: "default" 0.0;
+            rel1.relative: (25/380) (25/380);
+            rel2.relative: (365/380) (365/380);
+            aspect: 1.0 1.0; aspect_preference: BOTH;
+            image.normal: "bz5_logo.png";
+            color_class: "/fg/normal/gadgets/bluez/off";
+         }
+      }
+   }
+}

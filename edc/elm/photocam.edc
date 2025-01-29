@@ -1,0 +1,21 @@
+group { name: "elm/photocam/base/default";
+   inherit: "elm/scroller/base/default";
+   IMAGE_RING("ringa", 160)
+   IMAGE_RING("ringb", 160)
+   IMAGE_RING("ringc", 160)
+   parts {
+      BUSY("base", "elm,state,busy,start", "elm", "elm,state,busy,stop", "elm")
+      part { name: "base"; type: RECT;
+        scale: 1;
+        description { state: "default" 0.0;
+          color: 0 0 0 0; // no cc
+          rel1.offset: 4 4;
+          rel2.offset: -5 -5;
+          align: 1.0 1.0;
+          min: 40 40;
+          max: 40 40;
+          offscale;
+        }
+      }
+   }
+}

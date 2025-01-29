@@ -1,0 +1,84 @@
+/*fonts {
+   font: "PT_Sans-Web-Regular.ttf" "PTSans";
+   font: "PT_Sans-Web-Bold.ttf" "PTSans-Bold";
+   font: "PT_Sans-Web-Italic.ttf" "PTSans-Italic";
+   font: "PT_Sans-Web-BoldItalic.ttf" "PTSans-BoldItalic";
+}
+
+#define FN     "PTSans"
+#define FNBD   "PTSans-Bold"
+#define FNIT   "PTSans-Italic"
+#define FNBDIT "PTSans-BoldItalic"
+*/
+#define FN     "Sans"
+#define FNBD   "Sans:style=Bold"
+#define FNIT   "Sans:style=Oblique"
+#define FNBDIT "Sans:style=Bold Italic"
+
+#define ENABLED_TEXTBLOCK_TAGS                                             \
+   tag: "em" "+ font_style=Oblique";                                       \
+   tag: "hilight" "+ font_weight=Bold color=cc:/fg/normal/text-standout";  \
+   tag: "heading" "+ font_weight=Bold color=cc:/fg/normal/text-heading font_size=11"; \
+   tag: "link" "+ color=cc:/fg/normal/text-link underline=on underline_color=cc:/fg/normal/text-link"; \
+   tag: "preedit" "+ underline=on underline_color=cc:/fg/normal/text-preedit"; \
+   tag: "preedit_sel" "+ backing=on backing_color=cc:/bg/normal/text-preedit-sel color=cc:/fg/normal/text-preedit-sel"; \
+   tag: "title" "+ font_size=26";                                          \
+   tag: "subtitle" "+ font_size=18";                                       \
+   tag: "bigger" "+ font_size=12";                                         \
+   tag: "big" "+ font_size=11";                                            \
+   tag: "small" "+ font_size=8";                                           \
+   tag: "smaller" "+ font_size=7";                                         \
+   tag: "name" "+ color=cc:/fg/normal/text-name font_weight=Bold";         \
+   tag: "val" "+ color=cc:/fg/normal/text-val";                            \
+   tag: "info" "+ color=cc:/fg/normal/text-info";                          \
+   tag: "success" "+ color=cc:/fg/normal/text-success";                    \
+   tag: "warning" "+ color=cc:/fg/normal/text-warning";                    \
+   tag: "failure" "+ color=cc:/fg/normal/text-failure";                    \
+   tag: "code" "+ font=Mono color=cc:/fg/normal/text-code";                \
+   tag: "comment" "+ color=cc:/fg/normal/text-comment";                    \
+   tag: "string" "+ color=cc:/fg/normal/text-string";                      \
+   tag: "number" "+ color=cc:/fg/normal/text-number font_weight=Bold";     \
+   tag: "brace" "+ color=cc:/fg/normal/text-brace";                        \
+   tag: "type" "+ color=cc:/fg/normal/text-type";                          \
+   tag: "class" "+ color=cc:/fg/normal/text-class font_weight=Bold";       \
+   tag: "function" "+ color=cc:/fg/normal/text-function font_weight=Bold"; \
+   tag: "param" "+ color=cc:/fg/normal/text-param";                        \
+   tag: "keyword" "+ color=cc:/fg/normal/text-keyword font_weight=Bold";   \
+   tag: "preprocessor" "+ color=cc:/fg/normal/text-preprocessor font_weight=Bold"; \
+   tag: "line_added" "+ color=cc:/fg/normal/text-line-added";              \
+   tag: "line_removed" "+ color=cc:/fg/normal/text-line-removed";          \
+   tag: "line_changed" "+ color=cc:/fg/normal/text-line-changed";
+
+#define DISABLED_TEXTBLOCK_TAGS                                            \
+   tag: "em" "+ font_style=Oblique";                                       \
+   tag: "hilight" "+ font_weight=Bold color=cc:/fg/disabled/text-standout"; \
+   tag: "heading" "+ font_weight=Bold color=cc:/fg/disabled/text-heading font_size=11"; \
+   tag: "link" "+ color=cc:/fg/disabled/text-link underline=on underline_color=cc:/fg/disabled/text-link"; \
+   tag: "preedit" "+ underline=on underline_color=cc:/fg/normal/text-preedit"; \
+   tag: "preedit_sel" "+ backing=on backing_color=cc:/bg/disabled/text-preedit-sel color=cc:/fg/disabled/text-preedit-sel"; \
+   tag: "title" "+ font_size=26";                                          \
+   tag: "subtitle" "+ font_size=18";                                       \
+   tag: "bigger" "+ font_size=12";                                         \
+   tag: "big" "+ font_size=11";                                            \
+   tag: "small" "+ font_size=8";                                           \
+   tag: "smaller" "+ font_size=7";                                         \
+   tag: "name" "+ color=cc:/fg/disabled/text-name font_weight=Bold";       \
+   tag: "val" "+ color=cc:/fg/disabled/text-val";                          \
+   tag: "info" "+ color=cc:/fg/disabled/text-info";                        \
+   tag: "success" "+ color=cc:/fg/disabled/text-success";                  \
+   tag: "warning" "+ color=cc:/fg/disabled/text-warning";                  \
+   tag: "failure" "+ color=cc:/fg/disabled/text-failure";                  \
+   tag: "code" "+ font=Mono color=cc:/fg/disabled/text-code";              \
+   tag: "comment" "+ color=cc:/fg/disabled/text-comment";                  \
+   tag: "string" "+ color=cc:/fg/disabled/text-string";                    \
+   tag: "number" "+ color=cc:/fg/disabled/text-number font_weight=Bold";   \
+   tag: "brace" "+ color=cc:/fg/disabled/text-brace";                      \
+   tag: "type" "+ color=cc:/fg/disabled/text-type";                        \
+   tag: "class" "+ color=cc:/fg/disabled/text-type font_weight=Bold";      \
+   tag: "function" "+ color=cc:/fg/disabled/text-function font_weight=Bold"; \
+   tag: "param" "+ color=cc:/fg/disabled/text-param";                      \
+   tag: "keyword" "+ color=cc:/fg/disabled/text-keyword font_weight=Bold"; \
+   tag: "preprocessor" "+ color=cc:/fg/disabled/text-preprocessor font_weight=Bold"; \
+   tag: "line_added" "+ color=cc:/fg/disabled/text-line-added";            \
+   tag: "line_removed" "+ color=cc:/fg/disabled/text-line-removed";        \
+   tag: "line_changed" "+ color=cc:/fg/disabled/text-line-changed";

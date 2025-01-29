@@ -1,0 +1,222 @@
+group { name: "e/modules/battery/main";
+   images.image: "bat_base.png" COMP;
+   min: 16 16;
+   max: 160 160;
+   script {
+      public load_time;
+      public message(Msg_Type:type, id, ...) {
+         if ((type == MSG_FLOAT) && (id == 1)) {
+            new Float:val = getfarg(2);
+            val = 0.05 + (0.9 * (1.0 - val));
+            custom_state(PART:"fill_clip", "default", 0.0);
+            set_state_val(PART:"fill_clip", STATE_REL1, 0.0, val);
+            set_state(PART:"fill_clip", "custom", 0.0);
+         }
+      }
+      public Float:year_sec() {
+         new year, month, day, yearday, weekday, hour, minute;
+         new Float:second;
+
+         date(year, month, day, yearday, weekday, hour, minute, second);
+         return seconds() + float(yearday * 24 * 3600);
+      }
+      public run_prog_later(prog) {
+         new Float:second, Float:start;
+
+         second = Float:year_sec();
+         start = get_float(load_time);
+         if ((second - start) > float(5)) run_program(prog);
+      }
+   }
+   parts {
+      part { name: "pulse_clip"; type: RECT;
+         description { state: "default" 0.0;
+            rel.to: "bg";
+         }
+         description { state: "faded" 0.0;
+            inherit: "default" 0.0;
+            color: 255 255 255 128; // no cc
+         }
+      }
+      part { name: "fill_clip"; type: RECT;
+         clip_to: "pulse_clip";
+         description { state: "default" 0.0;
+            rel.to: "bg";
+         }
+      }
+      part { name: "info_clip"; type: RECT;
+         description { state: "default" 0.0;
+            rel.to: "bg";
+            color_class: "/fg/normal/gadgets/battery/text/info";
+            color: 255 255 255 0; // no cc
+         }
+         description { state: "visible" 0.0;
+            inherit: "default" 0.0;
+            color: 255 255 255 255; // no cc
+         }
+      }
+      part { name: "bg";
+         clip_to: "pulse_clip";
+         description { state: "default" 0.0;
+            aspect: 1.0 1.0; aspect_preference: BOTH;
+            image.normal: "bat_base.png";
+            color_class: "/bg-dark/normal/gadgets/battery/base";
+         }
+      }
+      part { name: "fill";
+         clip_to: "fill_clip";
+         description { state: "default" 0.0;
+            rel.to: "bg";
+            image.normal: "bat_base.png";
+            color_class: "/fg/normal/gadgets/battery/level/discharge";
+         }
+         description { state: "charging" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/fg/normal/gadgets/battery/level/charge";
+         }
+      }
+      part { name: "e.text.reading"; type: TEXT; mouse_events: 0;
+         scale: 1;
+         clip_to: "info_clip";
+         description { state: "default" 0.0;
+            align: 0.5 0.0;
+            rel.to: "bg";
+            rel1.relative: 0.25 0.15;
+            rel2.relative: 0.75 0.53;
+            color_class: "/fg/normal/gadgets/battery/text/reading";
+            text { font: FN; size: 8;
+               min: 0 1;
+               fit: 1 1;
+               ellipsis: -1;
+               align: 0.5 0.5;
+               text_class: "module_small";
+            }
+         }
+      }
+      part { name: "e.text.time"; type: TEXT; mouse_events: 0;
+         scale: 1;
+         clip_to: "info_clip";
+         description { state: "default" 0.0;
+            align: 0.5 1.0;
+            rel.to: "bg";
+            rel1.relative: 0.25 0.47;
+            rel2.relative: 0.75 0.85;
+            color_class: "/fg/normal/gadgets/battery/text/time";
+            text { font: FN; size: 8;
+               min: 0 1;
+               fit: 1 1;
+               ellipsis: -1;
+               align: 0.5 0.5;
+               text_class: "module_small";
+            }
+         }
+      }
+      part { name: "over"; type: RECT;
+         description { state: "default" 0.0;
+            color: 0 0 0 0; // no cc
+         }
+      }
+   }
+   programs {
+      program { signal: "load"; source: "";
+         script { set_float(load_time, year_sec()); }
+      }
+      program { signal: "e,state,ac,on"; source: "e";
+         script { run_prog_later(PROGRAM:"ac_on"); }
+      }
+      program { name: "ac_on";
+         action: PLAY_SAMPLE "synth-worble-up" 1.0 ALERT;
+      }
+      program { signal: "e,state,ac,off"; source: "e";
+         script { run_prog_later(PROGRAM:"ac_off"); }
+      }
+      program { name: "ac_off";
+         action: PLAY_SAMPLE "synth-worble-dn" 1.0 ALERT;
+      }
+      program { signal: "e,state,charging"; source: "e";
+         action: STATE_SET "charging" 0.0;
+         target: "fill";
+      }
+      program { signal: "e,state,discharging"; source: "e";
+         action: STATE_SET "default" 0.0;
+         target: "fill";
+      }
+      program { name: "pulse";
+         signal: "e,action,pulse,start"; source: "e";
+         action: STATE_SET "faded" 0.0;
+         transition: ACCELERATE 0.3;
+         after: "pulse2";
+         target: "pulse_clip";
+      }
+      program { name: "pulse2";
+         action: STATE_SET "default" 0.0;
+         transition: ACCELERATE 0.1;
+         target: "pulse_clip";
+         after: "pulse";
+      }
+      program { signal: "e,action,pulse,stop"; source: "e";
+         action: ACTION_STOP;
+         target: "pulse";
+         target: "pulse2";
+         after: "pulse3";
+      }
+      program { name: "pulse3";
+         signal: "e,action,pulse,stop"; source: "e";
+         action: STATE_SET "default" 0.0;
+         target: "pulse_clip";
+      }
+      program { signal: "mouse,in"; source: "over";
+         action: STATE_SET "visible" 0.0;
+         transition: SINUSOIDAL 0.3;
+         target: "info_clip";
+      }
+      program { signal: "mouse,out"; source: "over";
+         action: STATE_SET "default" 0.0;
+         transition: SINUSOIDAL 0.3;
+         target: "info_clip";
+      }
+   }
+}
+
+group { name: "e/modules/battery/popup";
+   min: 320 80;
+   parts {
+      part { name: "e.swallow.battery"; type: SWALLOW;
+         scale: 1;
+         description { state: "default" 0.0;
+            min: 80 80;
+            max: 80 80;
+            align: 0.0 0.5;
+         }
+      }
+      part { name: "e.text.title"; type: TEXT;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel1.relative: 1.0 0.0;
+            rel1.to_x: "e.swallow.battery";
+            rel2.relative: 1.0 0.5;
+            color_class: "/fg/normal/gadgets/battery/popup/title";
+            text { font: FNBD; size: 10;
+               text: "Your battery is low!";
+               min: 1 1;
+               ellipsis: -1;
+               text_class: "module_large";
+            }
+         }
+      }
+      part { name: "e.text.label"; type: TEXT;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel1.relative: 1.0 0.5;
+            rel1.to_x: "e.swallow.battery";
+            color_class: "/fg/normal/gadgets/battery/popup/text";
+            text { font: FN; size: 10;
+               text: "AC power is recommended.";
+               min: 1 1;
+               ellipsis: -1;
+               text_class: "module_normal";
+            }
+         }
+      }
+   }
+}

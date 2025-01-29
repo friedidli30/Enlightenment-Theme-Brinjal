@@ -1,0 +1,110 @@
+//Efl.Ui.Navigation_Bar Themes
+group { "efl/navigation_bar";
+   data.item: "version" "123";
+   styles {
+      style { name: "navigation_bar_text";
+         base: "font="FNBD" font_size=10 text_class=label align=center color=cc:/fg/normal/navigation/title ellipsis=1.0 wrap=mixed";
+         tag: "br" "\n";
+         tag: "hilight" "+ font="FNBD" text_class=label_light";
+         tag: "b" "+ font="FNBD" text_class=label_light";
+         tag: "whitecolor" "+ color=#fff"; // no cc
+         tag: "tab" "\t";
+      }
+   }
+   parts {
+      spacer { "base";
+         desc { "default";
+         }
+      }
+      swallow { "efl.back_button";
+         scale;
+         desc { "default";
+            fixed: 1 0;
+            min: 0 0;
+            max: 0 -1;
+            rel.to: "base";
+            rel2.relative: 0.0 1.0;
+            align: 0.0 0.5;
+            hid;
+         }
+         desc { "visible";
+            inherit: "default";
+            min: 40 20;
+            max: 40 -1;
+            vis;
+         }
+      }
+      swallow { "efl.left_content";
+         scale;
+         desc { "default";
+            rel.to: "base";
+            rel2.relative: 0.0 1.0;
+            align: 0.0 0.5;
+            min: 40 20;
+            max: 40 -1;
+         }
+      }
+      swallow { "efl.right_content";
+         scale;
+         desc { "default";
+            rel.to: "base";
+            rel1.relative: 1.0 0.0;
+            align: 1.0 0.5;
+            min: 40 20;
+            max: 40 -1;
+         }
+      }
+      spacer { "text_base";
+         desc { "default";
+            rel1.to: "efl.back_button";
+            rel1.relative: 1.0 0.0;
+            rel2.to: "efl.right_content";
+            rel2.relative: 0.0 1.0;
+         }
+         desc { "left_content";
+            inherit: "default";
+            rel1.to: "efl.left_content";
+            rel1.relative: 1.0 0.0;
+         }
+      }
+      textblock { "efl.text";
+         scale;
+         desc { "default";
+            rel.to: "text_base";
+            text.style: "navigation_bar_text";
+         }
+      }
+      programs {
+         program { signal: "efl,state,back_button,visible"; source: "efl";
+            action: STATE_SET "visible" 0.0;
+            target: "efl.back_button";
+         }
+         program { signal: "efl,state,back_button,hidden"; source: "efl";
+            action: STATE_SET "default" 0.0;
+            target: "efl.back_button";
+         }
+         program { signal: "efl,state,left_content,set"; source: "efl";
+            action: STATE_SET "left_content" 0.0;
+            target: "text_base";
+         }
+         program { signal: "efl,state,left_content,unset"; source: "efl";
+            action: STATE_SET "default" 0.0;
+            target: "text_base";
+         }
+      }
+   }
+}
+
+group { name: "efl/navigation_bar/back_button";
+   inherit: "efl/button";
+   data.item: "version" "123";
+   parts {
+      image { name: "icon_arrow_left";
+         insert_before: "efl.content";
+         desc { "default";
+            image.normal: "i-arrow-l";
+            color_class: "/fg/normal/navigation/back/arrow";
+         }
+      }
+   }
+}

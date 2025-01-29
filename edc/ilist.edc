@@ -1,0 +1,258 @@
+group { name: "e/ilist";
+   parts {
+      part { name: "typebuf_clip"; type: RECT;
+         description { state: "default" 0.0;
+            visible: 0;
+            color: 255 255 255 0; // no cc
+         }
+         description { state: "active" 0.0;
+            visible: 1;
+            color: 255 255 255 255; // no cc
+         }
+      }
+      part { name: "base"; type: RECT; mouse_events: 0;
+         clip_to: "typebuf_clip";
+         scale: 1;
+         description { state: "default" 0.0;
+            rel.to: "e.text.label";
+            rel1.offset: -8 -8;
+            rel2.offset: 7 7;
+            color_class: "/dim/normal/list/typebuf/base";
+            offscale;
+         }
+      }
+      alias: "e.text.typebuf_label" "e.text.label";
+      part { name: "e.text.label"; type: TEXT; mouse_events: 0;
+         clip_to: "typebuf_clip";
+         scale: 1;
+         description { state: "default" 0.0;
+            rel1.relative: 0.5 0.5;
+            rel1.offset: -8 -8;
+            rel2.relative: 0.5 0.5;
+            rel2.offset: 7 7;
+            color_class: "/fg/normal/list/typebuf/text";
+            text { font: FNBD; size: 10;
+               min: 1 1;
+               ellipsis: -1;
+               align: 0.5 0.5;
+               text_class: "ilist_typebuf";
+            }
+            offscale;
+         }
+      }
+   }
+   programs {
+      program { signal: "e,state,typebuf,start"; source: "e";
+         action: STATE_SET "active" 0.0;
+         transition: SINUSOIDAL 0.25;
+         target: "typebuf_clip";
+      }
+      program { signal: "e,state,typebuf,stop"; source: "e";
+         action: STATE_SET "default" 0.0;
+         transition: SINUSOIDAL 1.0;
+         target: "typebuf_clip";
+      }
+   }
+}
+
+group { name: "e/widgets/ilist";
+//   data.item: "stacking" "above";
+//   data.item: "stacking" "below";
+//   data.item: "selectraise" "on";
+   parts {
+      part { name: "base"; type: RECT; mouse_events: 0;
+         description { state: "default" 0.0;
+            color_class: "/bg/normal/list/item";
+         }
+      }
+      part { name: "sel_base"; type: RECT; mouse_events: 0;
+         description { state: "default" 0.0;
+            color_class: "/bg/selected/list/item";
+            visible: 0;
+         }
+         description { state: "selected" 0.0;
+            inherit: "default" 0.0;
+            visible: 1;
+         }
+         description { state: "disabled" 0.0;
+            inherit: "default" 0.0;
+            visible: 0;
+         }
+      }
+      part { name: "e.swallow.icon"; type: SWALLOW; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            align: 0.0 0.5;
+            aspect: 1.0 1.0; aspect_preference: VERTICAL;
+            rel1.offset: 4 4;
+            rel2.relative: 0.0 1.0;
+            rel2.offset: 4 -5;
+            offscale;
+         }
+      }
+      part { name: "e.text.label"; type: TEXT; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel1.offset: 4 4;
+            rel1.relative: 1.0 0.0;
+            rel1.to_x: "e.swallow.icon";
+            rel2.offset: -5 -5;
+            rel2.relative: 0.0 1.0;
+            rel2.to_x: "e.swallow.end";
+            color_class: "/fg/normal/list/item";
+            text { font: FN; size: 10;
+               min: 1 1;
+               ellipsis: -1;
+               align: 0.0 0.5;
+               text_class: "ilist_item";
+            }
+            offscale;
+         }
+         description { state: "selected" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/fg/selected/list/item";
+         }
+         description { state: "disabled" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/fg/disabled/list/item";
+         }
+      }
+      part { name: "e.swallow.end"; type: SWALLOW; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            align: 1.0 0.5;
+            aspect: 1.0 1.0; aspect_preference: VERTICAL;
+            rel1.offset: -5 4;
+            rel1.relative: 1.0 0.0;
+            rel2.offset: -5 -5;
+            offscale;
+         }
+      }
+      part { name: "event"; type: RECT;
+         description { state: "default" 0.0;
+            color: 0 0 0 0; // no cc
+         }
+         description { state: "disabled" 0.0;
+            inherit: "default" 0.0;
+            visible: 0;
+         }
+      }
+   }
+   programs {
+      program { signal: "e,state,selected"; source: "e";
+         action: STATE_SET "selected" 0.0;
+         target: "sel_base";
+         target: "e.text.label";
+      }
+      program { signal: "e,state,unselected"; source: "e";
+         action: STATE_SET "default" 0.0;
+         target: "sel_base";
+         target: "e.text.label";
+      }
+      program { signal: "e,state,disabled"; source: "e";
+         action: STATE_SET "disabled" 0.0;
+         target: "sel_base";
+         target: "e.text.label";
+      }
+      program { signal: "e,state,enabled"; source: "e";
+         action: STATE_SET "default" 0.0;
+         target: "sel_base";
+         target: "e.text.label";
+      }
+   }
+}
+
+group { name: "e/widgets/ilist_odd";
+   inherit: "e/widgets/ilist";
+   parts {
+      part { name: "base";
+         description { state: "default" 0.0;
+            color_class: "/bg-alt/normal/list/item";
+         }
+      }
+   }
+}
+
+group { name: "e/widgets/ilist_header";
+   alias: "e/widgets/ilist_header_odd";
+   data.item: "stacking" "above";
+   parts {
+      part { name: "base"; type: RECT; mouse_events: 0;
+         description { state: "default" 0.0;
+            color_class: "/bg/normal/list/group";
+         }
+      }
+      part { name: "e.swallow.icon"; type: SWALLOW; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            align: 0.0 0.5;
+            aspect: 1.0 1.0; aspect_preference: VERTICAL;
+            rel1.offset: 4 4;
+            rel2.relative: 0.0 1.0;
+            rel2.offset: 4 -5;
+            offscale;
+         }
+      }
+      part { name: "e.text.label"; type: TEXT; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel1.offset: 8 8;
+            rel1.relative: 1.0 0.0;
+            rel1.to_x: "e.swallow.icon";
+            rel2.offset: -8 -9;
+            rel2.relative: 0.0 1.0;
+            rel2.to_x: "e.swallow.end";
+            color_class: "/fg/normal/list/group";
+            text { font: FNBD; size: 10;
+               min: 0 1;
+               align: 0.0 0.5;
+               text_class: "ilist_item";
+            }
+            offscale;
+         }
+      }
+      part { name: "e.swallow.end"; type: SWALLOW; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            align: 1.0 0.5;
+            aspect: 1.0 1.0; aspect_preference: VERTICAL;
+            rel1.offset: -5 4;
+            rel1.relative: 1.0 0.0;
+            rel2.offset: -5 -5;
+            offscale;
+         }
+      }
+   }
+}
+
+group { name: "e/widgets/ilist/toggle_end";
+   images.image: "speaker_vol.png" COMP;
+   parts {
+      part { name: "base"; mouse_events: 0;
+         description { state: "default" 0.0;
+            image.normal: "speaker_vol.png";
+            aspect: 1.0 1.0; aspect_preference: BOTH;
+            color_class: "/fg/normal/list/toggle";
+            rel1.relative: 0.2 0.2;
+            rel2.relative: 0.8 0.8;
+         }
+         description { state: "visible" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/fg/selected/list/toggle";
+         }
+      }
+   }
+   programs {
+      program { signal: "e,state,checked"; source: "e";
+         action: STATE_SET "visible" 0.0;
+         transition: SINUSOIDAL 0.3;
+         target: "base";
+      }
+      program { signal: "e,state,unchecked"; source: "e";
+         action: STATE_SET "default" 0.0;
+         transition: SINUSOIDAL 0.3;
+         target: "base";
+      }
+   }
+}
+

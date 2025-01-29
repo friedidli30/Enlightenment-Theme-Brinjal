@@ -1,0 +1,313 @@
+group { name: "e/modules/notification/logo";
+   images.image: "exclam.png" COMP;
+   parts {
+      part { name: "spacer"; type: SPACER;
+         scale: 1;
+         description { state: "default" 0.0;
+            min: 40 40;
+            max: 40 40;
+         }
+      }
+      part { name: "base"; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            image.normal: "exclam.png";
+            aspect: (56/160) (56/160); aspect_preference: BOTH;
+            color_class: "/fg/normal/notification/logo";
+            fixed: 1 1;
+         }
+      }
+   }
+}
+
+group { name: "e/modules/notification/main";
+   images.image: "win_shad_flat.png" COMP;
+   data.item: "app_icon_max" "40 40";
+   styles {
+      style { name: "notification_style";
+         base: "font="FN" font_size=10 align=left color=cc:/fg/normal/notification/text wrap=word text_class=notification_body";
+         tag:  "subject"  "+ text_class=module_large color=cc:/fg/normal/notification/text/subject align=center";
+         tag:  "body"  "+ text_class=module_normal";
+         tag:  "br" "\n";
+         tag:  "ps" "ps";
+         tag:  "b" "+ font="FNBD" text_class=module_bold color=cc:/fg/normal/notification/text/bold";
+         tag:  "i" "+ font="FNIT" text_class=module_italic";
+         tag:  "u" "+ underline=on underline_color=cc:/fg/normal/notification/text/underline";
+         tag:  "link" "+ color=cc:/fg/normal/text-link underline=on underline_color=cc:/fg/normal/text-link";
+      }
+   }
+
+   parts {
+      part { name: "shadow"; type: RECT;
+         description { state: "default" 0.0;
+            rel.to: "_sh1";
+            color_class: "/shadow/normal/notification";
+         }
+      }
+      WIN_SHAD("base", "shadow", "win_shad_flat.png", 10, 10, 7, 14, 0.25);
+      part { name: "base"; type: RECT;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel1.offset: 32 32;
+            rel2.offset: -33 -33;
+            color_class: "/bg/normal/notification";
+            offscale;
+         }
+      }
+      part { name: "titleclip"; type: RECT;
+         description { state: "default" 0.0;
+            rel2.to_x: "notification.event.close";
+            rel2.relative: 0.0 1.0;
+         }
+      }
+      part { name: "bodyclip"; type: RECT;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel.to: "base";
+            min: 220 80;
+         }
+      }
+      part { name: "notification.swallow.app_icon"; type: SWALLOW; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            align: 0.0 0.5;
+            aspect: 1.0 1.0; aspect_preference: BOTH;
+            rel.to: "base";
+            rel1.to_y: "notification.textblock.message";
+            rel1.offset: 12 0;
+            rel2.offset: 12 -13;
+            rel2.relative: 0.0 1.0;
+            min: 24 24;
+            fixed: 1 1;
+            offscale;
+         }
+      }
+      part { name: "message"; type: TEXTBLOCK; mouse_events: 0;
+         scale: 1;
+         entry_mode: EDITABLE;
+         select_mode: EXPLICIT;
+         multiline: 1;
+         description { state: "default" 0.0;
+            align: 0.0 0.0;
+            min: 200 20;
+            max: 400 99999;
+            rel.to: "base";
+            rel1.to_x: "notification.swallow.app_icon";
+            rel1.to_y: "notification.text.title";
+            rel1.relative: 1.0 1.0;
+            rel1.offset: 4 4;
+            rel2.offset: -27 -5;
+            rel2.to_y: "notification.swallow.actions";
+            rel2.relative: 1.0 0.0;
+            text { style: "notification_style";
+               text_source: "notification.textblock.message";
+               min: 0 1;
+            }
+            visible: 0;
+            offscale;
+         }
+      }
+      part { name: "notification.textblock.message"; type: TEXTBLOCK;
+         clip_to: "bodyclip";
+         scale: 1;
+         entry_mode: EDITABLE;
+         select_mode: EXPLICIT;
+         multiline: 1;
+         description { state: "default" 0.0;
+            align: 0.0 0.0;
+            rel.to: "base";
+            rel1.to_x: "notification.swallow.app_icon";
+            rel1.to_y: "notification.text.title";
+            rel1.relative: 1.0 1.0;
+            rel1.offset: 4 4;
+            rel2.offset: -27 -5;
+            rel2.to_y: "notification.swallow.actions";
+            rel2.relative: 1.0 0.0;
+            text { style: "notification_style";
+               min: 0 1;
+            }
+            fixed: 1 1;
+            offscale;
+         }
+      }
+      part { name: "notification.swallow.desktop_icon"; type: SWALLOW; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            align: 0.0 0.0;
+            aspect: 1.0 1.0; aspect_preference: BOTH;
+            rel1.to_x: "base";
+            rel1.to_y: "notification.text.title";
+            rel1.offset: 12 0;
+            rel2.to: "notification.text.title";
+            rel2.offset: 12 -1;
+            rel2.relative: 0.0 1.0;
+            min: 15 15;
+            fixed: 1 1;
+            offscale;
+         }
+      }
+      part { name: "notification.text.title"; type: TEXT; mouse_events: 0;
+         clip_to: "titleclip";
+         scale: 1;
+         description { state: "default" 0.0;
+            rel.to: "base";
+            rel1.to_x: "notification.swallow.app_icon";
+            rel1.relative: 1.0 0.0;
+            rel1.offset: 4 12;
+            rel2.relative: 0.0 0.0;
+            rel2.to_x: "notification.event.close";
+            rel2.offset: -5 12;
+            color_class: "/fg/normal/notification/text/title";
+            align: 0.0 0.0;
+            text { font: FNBD; size: 10;
+               min: 0 1;
+               align: 0.0 0.5;
+               text_class: "notification_title";
+            }
+            fixed: 0 1;
+            offscale;
+         }
+      }
+
+      part { name: "notification.swallow.actions"; type: SWALLOW;
+         scale: 1;
+         description { state: "default" 0.0;
+            align: 0.5 1.0;
+            rel.to: "base";
+            rel1.relative: 0.0 1.0;
+            rel1.offset: 12 -13;
+            rel2.offset: -13 -13;
+            offscale;
+            visible: 0;
+         }
+         description { state: "visible" 0.0;
+            inherit: "default" 0.0;
+            visible: 1;
+            min: 40 20;
+         }
+      }
+
+      part { name: "close";
+         scale: 1;
+         description { state: "default" 0.0;
+            image.normal: "i-close";
+            rel.to: "notification.event.close";
+            min: 15 15;
+            max: 15 15;
+            fixed: 1 1;
+            color_class: "/fg/normal/notification/button/close";
+         }
+         description { state: "selected" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/fg/pressed/notification/button/close";
+         }
+      }
+      part { name: "notification.event.close"; type: RECT;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel.to: "base";
+            rel1.relative: 1.0 0.0;
+            rel1.offset: -13 12;
+            rel2.relative: 1.0 0.0;
+            rel2.offset: -13 12;
+            align: 1.0 0.0;
+            min: 15 15;
+            color: 0 0 0 0; // no cc
+            fixed: 1 1;
+            offscale;
+         }
+      }
+   }
+   programs {
+      program { signal: "mouse,down,1"; source: "notification.event.close";
+         action: STATE_SET "selected" 0.0;
+         target: "close";
+      }
+      program { signal: "mouse,up,1"; source: "notification.event.close";
+         action: STATE_SET "default" 0.0;
+         target: "close";
+      }
+      program { signal: "mouse,clicked,1"; source: "notification.event.close";
+         action: SIGNAL_EMIT "notification,close" "theme";
+      }
+      program { signal: "mouse,clicked,1"; source: "base";
+         action: SIGNAL_EMIT "notification,find" "theme";
+      }
+      program { signal: "e,state,actions,show"; source: "e";
+         action: STATE_SET "visible" 0.0;
+         target: "notification.swallow.actions";
+      }
+      program { signal: "e,state,actions,hide"; source: "e";
+         action: STATE_SET "default" 0.0;
+         target: "notification.swallow.actions";
+      }
+//      program { signal: "e,category,device"; source: "e"; }
+//      program { signal: "e,category,device.added"; source: "e"; }
+//      program { signal: "e,category,device.error"; source: "e"; }
+//      program { signal: "e,category,device.removed"; source: "e"; }
+//      program { signal: "e,category,email"; source: "e"; }
+//      program { signal: "e,category,email.arrived"; source: "e"; }
+//      program { signal: "e,category,email.bounced"; source: "e"; }
+//      program { signal: "e,category,im"; source: "e"; }
+//      program { signal: "e,category,im.error"; source: "e"; }
+//      program { signal: "e,category,im.received"; source: "e"; }
+//      program { signal: "e,category,network"; source: "e"; }
+//      program { signal: "e,category,network.connected"; source: "e"; }
+//      program { signal: "e,category,network.disconnected"; source: "e"; }
+//      program { signal: "e,category,network.error"; source: "e"; }
+//      program { signal: "e,category,presence"; source: "e"; }
+//      program { signal: "e,category,presence.offline"; source: "e"; }
+//      program { signal: "e,category,presence.online"; source: "e"; }
+//      program { signal: "e,category,transfer"; source: "e"; }
+//      program { signal: "e,category,transfer.complete"; source: "e"; }
+//      program { signal: "e,category,transfer.error"; source: "e"; }
+//      program { signal: "e,urgency,low"; source: "e"; }
+//      program { signal: "e,urgency,normal"; source: "e"; }
+//      program { signal: "e,urgency,critical"; source: "e"; }
+//      program { signal: "notification,new"; source: "notification"; }
+//      program { signal: "notification,del"; source: "notification"; }
+//      program { signal: "notification,deleted"; source: "notification"; }
+   }
+}
+
+group { name: "e/modules/notification/action";
+   parts {
+      part { name: "e.text.label"; type: TEXT;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel1.offset: 4 4;
+            rel2.offset: -5 -5;
+            color_class: "/fg/normal/notification/text/title";
+            text { font: FNBD; size: 10;
+               min: 1 1;
+               text_class: "notification_title";
+            }
+            offscale;
+         }
+         description { state: "selected" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/fg/pressed/notification/text/title";
+         }
+      }
+      part { name: "event"; type: RECT;
+         scale : 1;
+         description { state: "default" 0.0;
+            color: 0 0 0 0; // no cc
+            min: 40 20;
+         }
+      }
+   }
+   programs {
+      program { signal: "mouse,down,1"; source: "event";
+         action: STATE_SET "selected" 0.0;
+         target: "e.text.label";
+      }
+      program { signal: "mouse,up,1"; source: "event";
+         action: STATE_SET "default" 0.0;
+         target: "e.text.label";
+      }
+      program { signal: "mouse,clicked,1"; source: "event";
+         action: SIGNAL_EMIT "e,action,clicked" "e";
+      }
+   }
+}

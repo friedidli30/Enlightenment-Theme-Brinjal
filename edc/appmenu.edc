@@ -1,0 +1,52 @@
+group { name: "e/modules/appmenu/item";
+   data.item: "padding_horizontal" "5";
+   data.item: "padding_vertical"   "5";
+   parts {
+      part { name: "background"; type: RECT; mouse_events: 0;
+         description { state: "default" 0.0;
+            color_class: "/bg/normal/menu/item";
+            visible: 0;
+         }
+         description { state: "selected" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/bg/selected/menu/item";
+            visible: 1;
+         }
+      }
+      part { name: "text"; type: TEXT; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel1.offset: 4 4;
+            rel2.offset: -5 -5;
+            color_class: "/fg/normal/menu/item";
+            text { font: FN; size: 10;
+               min: 1 1;
+               ellipsis: -1;
+               text_class: "label";
+            }
+            offscale;
+         }
+         description { state: "selected" 0.0;
+            inherit: "default" 0.0;
+            color_class: "/fg/selected/menu/item";
+         }
+      }
+      part { name: "event_area"; type: RECT;
+         description { state: "default" 0.0;
+            color: 0 0 0 0; // no cc
+         }
+      }
+   }
+   programs {
+      program { signal: "mouse,in"; source: "event_area";
+         action: STATE_SET "selected" 0.0;
+         target: "background";
+         target: "text";
+      }
+      program { signal: "mouse,out"; source: "event_area";
+         action: STATE_SET "default" 0.0;
+         target: "background";
+         target: "text";
+      }
+   }
+}

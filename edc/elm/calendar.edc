@@ -1,0 +1,542 @@
+#define CIT_STYLES\
+      style { name: "calendar_date_style";\
+         base: "font="FN" font_size=10 color=cc:/fg/normal/calendar/day align=center text_class=calendar_day_text";\
+      }\
+      style { name: "calendar_date_holiday_style";\
+         base: "font="FN" font_size=10 color=cc:/fg/normal/calendar/day/holiday align=center text_class=calendar_day_text_holiday";\
+      }\
+      style { name: "calendar_date_today_style";\
+         base: "font="FN" font_size=10 color=cc:/fg/normal/calendar/day/today align=center text_class=calendar_day_text_today";\
+      }\
+      style { name: "calendar_date_disabled_style";\
+         base: "font="FN" font_size=10 color=cc:/fg/normal/calendar/day/disabled align=center text_class=calendar_day_text_disabled";\
+      }\
+      style { name: "calendar_date_weekend1_style";\
+         base: "font="FN" font_size=10 color=cc:/fg/normal/calendar/day/weekend1 align=center text_class=calendar_day_text_weekend1";\
+      }\
+      style { name: "calendar_date_weekend2_style";\
+         base: "font="FN" font_size=10 color=cc:/fg/normal/calendar/day/weekend2 align=center text_class=calendar_day_text_weekend2";\
+      }\
+
+#define CAL_SPIN(_sufix, _text, _relative)\
+      part { name: "left_bt"#_sufix; type: SPACER;\
+         scale: 1;\
+         description { state: "default" 0.0;\
+            fixed: 1 1;\
+            rel1 { to: #_relative;\
+               offset: 0 0;\
+            }\
+            rel2 { to: #_relative;\
+               offset: 0 -1;\
+            }\
+            align: 0.0 0.5;\
+            min: 25 25;\
+            max: 25 25;\
+         }\
+      }\
+      part { name: "right_bt"#_sufix; type: SPACER;\
+         scale: 1;\
+         description { state: "default" 0.0;\
+            fixed: 1 1;\
+            rel1 { to: #_relative;\
+               offset: -1 0;\
+            }\
+            rel2 { to: #_relative;\
+               offset: -1 -1;\
+            }\
+            align: 1.0 0.5;\
+            min: 25 25;\
+            max: 25 25;\
+         }\
+      }\
+      part { name: "elm,calendar,button"#_sufix",left"; type: SWALLOW;\
+         scale: 1;\
+         description { state: "default" 0.0;\
+            fixed: 1 1;\
+            rel.to: "left_bt"#_sufix;\
+            min: 15 15;\
+            max: 15 15;\
+         }\
+         description { state: "rtl" 0.0;\
+            inherit: "default" 0.0;\
+            rel.to: "right_bt"#_sufix;\
+         }\
+      }\
+      part { name: "elm,calendar,button"#_sufix",right"; type: SWALLOW;\
+         scale: 1;\
+         description { state: "default" 0.0;\
+            fixed: 1 1;\
+            rel.to: "right_bt"#_sufix;\
+            min: 15 15;\
+            max: 15 15;\
+         }\
+         description { state: "rtl" 0.0;\
+            inherit: "default" 0.0;\
+            rel.to: "left_bt"#_sufix;\
+         }\
+      }\
+      part { name: #_text; type: TEXT; mouse_events: 0;\
+         scale: 1;\
+         description { state: "default" 0.0;\
+            fixed: 1 1;\
+            rel1 { relative: 1.0 0.0;\
+               to: "left_bt"#_sufix;\
+               offset: 8 8;\
+            }\
+            rel2 { relative: 0.0 1.0;\
+               to: "right_bt"#_sufix;\
+               offset: -9 -9;\
+            }\
+            offscale;\
+            text { font: FNBD; size: 10;\
+               min: 0 1;\
+               text_class: "calendar_"#_text; \
+            }\
+            color_class: "/fg/normal/calendar/text/title"; \
+         }\
+      }
+
+#define CH(_pos) \
+   part { name: "ch_"#_pos"_base"; type: SPACER; \
+      description { state: "default" 0.0; \
+         rel.to: "header";\
+         rel1.relative: (_pos % 7 / 7) 0.0; \
+         rel2.relative: (_pos % 7 / 7 + 1 / 7) 1.0; \
+      } \
+   } \
+   part { name: "elm.ch_"#_pos".text"; type: TEXT; mouse_events: 0; \
+      scale: 1; \
+      clip_to: "ch_"#_pos"_clipper"; \
+      description { state: "default" 0.0; \
+         rel.to: "ch_"#_pos"_base"; \
+         rel1.offset: 0 3; \
+         rel2.offset: -1 -4; \
+         offscale;\
+         text { font: FN; size: 8; \
+            min: 1 1; \
+            ellipsis: -1; \
+            text_class: "calendar_weekday_text"; \
+         } \
+         color_class: "/fg/normal/calendar/text/day"; \
+      } \
+   } \
+   part { name: "ch_"#_pos"_clipper"; type: RECT; \
+      description { state: "default" 0.0; \
+         rel.to: "ch_"#_pos"_base"; \
+      } \
+   }
+
+#define CIT(_pos) \
+   part { name: "cit_"#_pos"_rect"; type: SPACER; \
+      description { state: "default" 0.0; \
+         rel.to: "base"; \
+         rel1.relative: (_pos % 7 / 7) (_pos / 7 / 6 - _pos % 7 / 7 / 6); \
+         rel2.relative: (_pos % 7 / 7 + 1 / 7) (_pos / 7 / 6 + 1 / 6 - _pos % 7 / 7 / 6); \
+      } \
+   } \
+   part { name: "cit_"#_pos"_event"; type: RECT; repeat_events: 1; \
+      description { state: "default" 0.0; \
+         rel.to: "cit_"#_pos"_rect"; \
+         color_class: "/bg/normal/calendar/day/normal"; \
+      } \
+      description { state: "today" 0.0; \
+         inherit: "default" 0.0; \
+         color_class: "/bg/normal/calendar/day/today"; \
+      } \
+   } \
+   part { name: "cit_"#_pos"_selected"; type: RECT; mouse_events: 0; \
+      description { state: "default" 0.0; \
+         rel.to: "cit_"#_pos"_rect"; \
+         color_class: "/bg/selected/calendar/day"; \
+         visible: 0; \
+      } \
+      description { state: "selected" 0.0; \
+         inherit: "default" 0.0; \
+         visible: 1; \
+      } \
+   } \
+   part { name: "cit_"#_pos"_focus"; type: RECT; mouse_events: 0; \
+      description { state: "default" 0.0; \
+         rel.to: "cit_"#_pos"_rect"; \
+         color_class: "/bg/selected/calendar/day/focused"; \
+         visible: 0; \
+      } \
+      description { state: "selected" 0.0; \
+         inherit: "default" 0.0; \
+         visible: 1; \
+      } \
+   } \
+   part { name: "elm.cit_"#_pos".text"; type: TEXTBLOCK; mouse_events: 0; \
+      scale: 1; \
+      description { state: "default" 0.0; \
+         rel.to: "cit_"#_pos"_rect"; \
+         rel1.offset: 3 0; \
+         rel2.offset: -4 -1; \
+         text.style: "calendar_date_style"; \
+         text.min: 1 1; \
+         text.ellipsis: -1; \
+         offscale; \
+      } \
+      description { state: "holiday" 0.0; \
+         inherit: "default" 0.0; \
+         text.style: "calendar_date_holiday_style"; \
+      } \
+      description { state: "today" 0.0; \
+         inherit: "default" 0.0; \
+         text.style: "calendar_date_today_style"; \
+      } \
+      description { state: "disabled" 0.0; \
+         inherit: "default" 0.0; \
+         text.style: "calendar_date_disabled_style"; \
+      } \
+      description { state: "weekend/day1" 0.0; \
+         inherit: "default" 0.0; \
+         text.style: "calendar_date_weekend1_style"; \
+      } \
+      description { state: "weekend/day2" 0.0; \
+         inherit: "default" 0.0; \
+         text.style: "calendar_date_weekend2_style"; \
+      } \
+   } \
+   part { name: "cit_"#_pos"_check"; mouse_events: 0; \
+      scale: 1; \
+      description { state: "default" 0.0; \
+         fixed: 1 1; \
+         rel.to: "cit_"#_pos"_rect"; \
+         rel1.relative: 0.6 0.5; \
+         min: 15 15; \
+         max: 15 15; \
+         align: 0.0 1.0;\
+         image.normal: "i-check"; \
+         color_class: "/fg/normal/calendar/day/checked"; \
+         visible: 0; \
+      } \
+      description { state: "visible" 0.0; \
+         inherit: "default" 0.0; \
+         visible: 1; \
+      } \
+   } \
+   part { name: "elm.cit_"#_pos".access"; type: RECT; repeat_events: 1; \
+      description { state: "default" 0.0; \
+         rel.to: "cit_"#_pos"_event"; \
+         color: 0 0 0 0; /* no cc */ \
+      } \
+   } \
+   programs { \
+      program { \
+         name:    "cit_"#_pos"_go_active"; \
+         signal:  "cit_"#_pos",selected"; \
+         source:  "elm"; \
+         action:  STATE_SET "selected" 0.0; \
+         target:  "cit_"#_pos"_selected"; \
+      } \
+      program { \
+         name:    "cit_"#_pos"_go_passive"; \
+         signal:  "cit_"#_pos",unselected"; \
+         source:  "elm"; \
+         action:  STATE_SET "default" 0.0; \
+         target:  "cit_"#_pos"_selected"; \
+      } \
+      program { \
+         name:    "cit_"#_pos"_focus_highlighted"; \
+         signal:  "cit_"#_pos",focused"; \
+         source:  "elm"; \
+         script { \
+            set_int(item_focus_enabled, 1); \
+            set_int(last_focused_item, _pos); \
+            if (get_int(win_focus_enabled) == 1) \
+               set_state(PART:"cit_"#_pos"_focus", "selected", 0.0); \
+         } \
+      } \
+      program { \
+         name:    "cit_"#_pos"_focus_unhighlighed"; \
+         signal:  "cit_"#_pos",unfocused"; \
+         source:  "elm"; \
+         script { \
+            set_int(item_focus_enabled, 0); \
+            set_state(PART:"cit_"#_pos"_focus", "default", 0.0); \
+         } \
+      } \
+      program { \
+         name:    "cit_"#_pos"_is_today"; \
+         signal:  "cit_"#_pos",today"; \
+         source:  "elm"; \
+         action:  STATE_SET "today" 0.0; \
+         target:  "elm.cit_"#_pos".text"; \
+         target:  "cit_"#_pos"_event";\
+      } \
+      program { \
+         name:    "cit_"#_pos"_not_today"; \
+         signal:  "cit_"#_pos",not_today"; \
+         source:  "elm"; \
+         action:  STATE_SET "default" 0.0; \
+         target:  "elm.cit_"#_pos".text"; \
+         target:  "cit_"#_pos"_event";\
+      } \
+      program { \
+         name:    "cit_"#_pos"_enable"; \
+         signal:  "cit_"#_pos",enable"; \
+         source:  "elm"; \
+         script { \
+            new st[31]; \
+            new Float:vl; \
+            get_state(PART:"elm.cit_"#_pos".text", st, 30, vl); \
+            if (!strcmp(st, "disabled")) \
+              set_state(PART:"elm.cit_"#_pos".text", "default", 0.0); \
+         } \
+      } \
+      program { \
+         name:    "cit_"#_pos"_disable"; \
+         signal:  "cit_"#_pos",disable"; \
+         source:  "elm"; \
+         action:  STATE_SET "disabled" 0.0; \
+         target:  "elm.cit_"#_pos".text"; \
+      } \
+      program { \
+         source: "cit_"#_pos"_clicked"; \
+         signal: "mouse,down,1"; \
+         source: "cit_"#_pos"_event"; \
+         action:  STATE_SET "selected" 0.0; \
+         target:  "cit_"#_pos"_selected"; \
+      } \
+      program { \
+         source: "cit_"#_pos"_clicked"; \
+         signal: "mouse,up,1"; \
+         source: "cit_"#_pos"_event"; \
+         action:  STATE_SET "default" 0.0; \
+         target:  "cit_"#_pos"_selected"; \
+      } \
+      program { \
+         source: "cit_"#_pos"_clicked"; \
+         signal: "mouse,clicked,1"; \
+         source: "cit_"#_pos"_event"; \
+         action: SIGNAL_EMIT "elm,action,selected" #_pos; \
+      } \
+      program { \
+         name:    "cit_"#_pos"_clear"; \
+         signal:  "cit_"#_pos",clear"; \
+         source:  "elm"; \
+         action:  STATE_SET "default" 0.0; \
+         target:  "cit_"#_pos"_check"; \
+         after:   "cit_"#_pos"_weekends_clear"; \
+         after:   "cit_"#_pos"_holiday_clear"; \
+      } \
+      program { \
+         name:    "cit_"#_pos"_weekends_clear"; \
+         script { \
+            new st[31]; \
+            new Float:vl; \
+            get_state(PART:"elm.cit_"#_pos".text", st, 30, vl); \
+            if (!strcmp(st, "weekend/day1") || !strcmp(st, "weekend/day2")) \
+              set_state(PART:"elm.cit_"#_pos".text", "default", 0.0); \
+         } \
+      } \
+      program { \
+         name:    "cit_"#_pos"_holiday_clear"; \
+         script { \
+            new st[31]; \
+            new Float:vl; \
+            get_state(PART:"elm.cit_"#_pos".text", st, 30, vl); \
+            if (!strcmp(st, "holiday")) \
+              set_state(PART:"elm.cit_"#_pos".text", "default", 0.0); \
+         } \
+      } \
+      program { \
+         name:    "cit_"#_pos"_checked"; \
+         signal:  "cit_"#_pos",checked"; \
+         source:  "elm"; \
+         action:  STATE_SET "visible" 0.0; \
+         target:  "cit_"#_pos"_check"; \
+      } \
+      program { \
+         name:    "cit_"#_pos"_holiday"; \
+         signal:  "cit_"#_pos",holiday"; \
+         source:  "elm"; \
+         script { \
+            new st[31]; \
+            new Float:vl; \
+            get_state(PART:"elm.cit_"#_pos".text", st, 30, vl); \
+            if (strcmp(st, "today")) \
+              set_state(PART:"elm.cit_"#_pos".text", "holiday", 0.0); \
+         } \
+      } \
+      program { \
+         name:    "cit_"#_pos"_weekend/day1"; \
+         signal:  "cit_"#_pos",weekend/day1"; \
+         source:  "elm"; \
+         script { \
+            new st[31]; \
+            new Float:vl; \
+            get_state(PART:"elm.cit_"#_pos".text", st, 30, vl); \
+            if ((strcmp(st, "today")) && (strcmp(st, "holiday")) )\
+              set_state(PART:"elm.cit_"#_pos".text", "weekend/day1", 0.0); \
+         } \
+      } \
+      program { \
+         name:    "cit_"#_pos"_weekend/day2"; \
+         signal:  "cit_"#_pos",weekend/day2"; \
+         source:  "elm"; \
+         script { \
+            new st[31]; \
+            new Float:vl; \
+            get_state(PART:"elm.cit_"#_pos".text", st, 30, vl); \
+            if ((strcmp(st, "today")) && (strcmp(st, "holiday")) )\
+              set_state(PART:"elm.cit_"#_pos".text", "weekend/day2", 0.0); \
+         } \
+      } \
+   }
+
+group { name: "elm/calendar/base/default";
+   data.item: "focus_highlight" "on";
+   script {
+      public rtl;
+      public win_focus_enabled;
+      public item_focus_enabled;
+      public last_focused_item;
+   }
+   styles {
+      CIT_STYLES
+   }
+   parts {
+      part { name: "bg"; type: SPACER;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel1.offset: 8 8;
+            rel2.offset: -9 -9;
+            offscale;
+         }
+      }
+      part { name: "elm.swallow.background"; type: SWALLOW;
+         description { state: "default" 0.0;
+            rel.to: "bg";
+         }
+      }
+      part { name: "spinner-base1"; type: SPACER;
+         scale: 1;
+         description { state: "default" 0.0;
+            min: 24 16;
+            max: 999999 16;
+            rel.to: "bg";
+            rel2.relative: 1.0 (1/8);
+            align: 0.5 0.0;
+         }
+      }
+      part { name: "table-base"; type: SPACER;
+         scale: 1;
+         description { state: "default" 0.0;
+            min: 70 60;
+            rel1.to_x: "bg";
+            rel1.to_y: "spinner-base1";
+            rel1.offset: 3 0;
+            rel1.relative: 0.0 1.0;
+            rel2.to: "bg";
+            rel2.offset: -4 -4;
+            offscale;
+         }
+      }
+      part { name: "header"; type: SPACER;
+         description { state: "default" 0.0;
+            rel.to: "table-base";
+            rel2.relative: 1.0 (1/7);
+            align: 0.5 0.0;
+            min: 0 25;
+         }
+      }
+      part { name: "header_separator"; type: RECT; mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            fixed: 1 1;
+            rel.to: "header";
+            rel1.relative: 0.0 1.0;
+            rel1.offset: 8 -1;
+            rel2.offset: -9 -1;
+            color_class: "/fg/normal/separator";
+            offscale;
+         }
+      }
+      part { name: "base"; type: SPACER;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel1.to_x: "table-base";
+            rel1.to_y: "header";
+            rel1.relative: 0.0 1.0;
+            rel1.offset: 3 0;
+            rel2.to: "table-base";
+            rel2.offset: -3 0;
+            offscale;
+         }
+      }
+
+      CAL_SPIN(,month_text, spinner-base1)
+      CH(0)   CH(1)   CH(2)   CH(3)   CH(4)   CH(5)   CH(6)
+      CIT(0)  CIT(1)  CIT(2)  CIT(3)  CIT(4)  CIT(5)  CIT(6)
+      CIT(7)  CIT(8)  CIT(9)  CIT(10) CIT(11) CIT(12) CIT(13)
+      CIT(14) CIT(15) CIT(16) CIT(17) CIT(18) CIT(19) CIT(20)
+      CIT(21) CIT(22) CIT(23) CIT(24) CIT(25) CIT(26) CIT(27)
+      CIT(28) CIT(29) CIT(30) CIT(31) CIT(32) CIT(33) CIT(34)
+      CIT(35) CIT(36) CIT(37) CIT(38) CIT(39) CIT(40) CIT(41)
+
+   }
+   programs {
+      program {
+         signal: "elm,action,focus_highlight,show";
+         source: "elm";
+         script {
+            set_int(win_focus_enabled, 1);
+            if (get_int(item_focus_enabled) == 1) {
+               new value[32];
+               snprintf(value, 32, "cit_%d,focused", get_int(last_focused_item));
+               emit(value, "elm");
+            }
+         }
+      }
+      program {
+         signal: "elm,action,focus_highlight,hide";
+         source: "elm";
+         script {
+            set_int(win_focus_enabled, 0);
+         }
+      }
+   }
+}
+
+group { name: "elm/calendar/base/double_spinners";
+   inherit: "elm/calendar/base/default";
+   parts {
+      part { name: "spinner-base1"; type: SPACER;
+         scale: 1;
+         description { state: "default" 0.0;
+            min: 24 24;
+            max: 999999 24;
+            rel.to: "bg";
+            rel1.offset: 6 6;
+            rel2.relative: 0.5 1.0;
+            rel2.offset: -7 -7;
+            align: 0.0 0.0;
+            offscale;
+         }
+      }
+      part { name: "spinner-base2"; type: SPACER;
+         scale: 1;
+         description { state: "default" 0.0;
+            min: 24 24;
+            max: 999999 24;
+            rel1.to_x: "spinner-base1";
+            rel1.to_y: "bg";
+            rel1.relative: 1.0 0;
+            rel1.offset: 6 6;
+            rel2.to: "bg";
+            rel2.offset: -7 -7;
+            align: 0.0 0.0;
+            offscale;
+         }
+      }
+      CAL_SPIN(,month_text, spinner-base1)
+      CAL_SPIN(_year, year_text, spinner-base2)
+   }
+}
+
+#undef CIT_STYLES
+#undef CAL_SPIN
+#undef CIT
+#undef CH

@@ -1,0 +1,38 @@
+/**
+Group: efl/image_zoomable (@since 1.23)
+	 Part Rectangle: efl.draggable.horizontal_bar (required)
+	 Part Rectangle: efl.draggable.vertical_bar (required)
+	 Part Swallow: efl.background (required)
+	 Part Swallow: efl.content (required)
+	 Part Swallow: efl.overlay (required)
+	 Signal: efl,action,scroll
+	 Signal: efl,horizontal_bar,visible,off
+	 Signal: efl,horizontal_bar,visible,on
+	 Signal: efl,state,busy,started
+	 Signal: efl,state,busy,stopped
+	 Signal: efl,vertical_bar,visible,off
+	 Signal: efl,vertical_bar,visible,on
+
+*/
+group { name: "efl/image_zoomable";
+   inherit: "efl/scroller";
+   data.item: "version" "123";
+   IMAGE_RING("ringa", 160)
+   IMAGE_RING("ringb", 160)
+   IMAGE_RING("ringc", 160)
+   parts {
+      BUSY("base", "elm,state,pulse,started", "efl", "elm,state,pulse,stopped", "efl")
+      part { name: "base"; type: RECT;
+         scale: 1;
+         description { state: "default" 0.0;
+            color: 0 0 0 0; // no cc
+            rel1.offset: 4 4;
+            rel2.offset: -5 -5;
+            align: 1.0 1.0;
+            min: 40 40;
+            max: 40 40;
+            offscale;
+         }
+      }
+   }
+}

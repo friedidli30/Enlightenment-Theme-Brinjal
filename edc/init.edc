@@ -1,0 +1,246 @@
+group { name: "e/init/splash";
+   set { name: "logo_mono";
+      image { image: "logo.png" COMP;  size: 601 601 99999 99999; }
+      image { image: "logo2.png" COMP; size: 301 301   600   600; }
+      image { image: "logo3.png" COMP; size: 151 151   300   300; }
+      image { image: "logo4.png" COMP; size:  76  76   150   150; }
+      image { image: "logo5.png" COMP; size:  0    0    75    75; }
+   }
+   script {
+      public is_ready;
+      public do_end;
+   }
+   parts {
+      part { name: "bg"; type: RECT;
+         clip_to: "fader";
+         description { state: "default" 0.0;
+            color_class: "/bg-dark/normal/init/base";
+         }
+      }
+      part { name: "logo";
+         scale: 1;
+         clip_to: "fader";
+         description { state: "default" 0.0;
+            image.normal: "logo_mono";
+            rel1.relative: 0.5 0.5;
+            rel2.relative: 0.5 0.5;
+            color_class: "/fg/normal/init/logo";
+            color: 255 255 255 0; // no cc
+            FIXED_SIZE(150, 150)
+         }
+         description { state: "active" 0.0;
+            inherit: "default" 0.0;
+            color: 255 255 255 255; // no cc
+         }
+      }
+      part { name: "e.text.title"; type: TEXT; mouse_events: 0;
+         scale: 1;
+         clip_to: "fader";
+         description { state: "default" 0.0;
+            align: 0.5 1.0;
+            rel1.relative: 0.05 0.0;
+            rel1.offset: 4 -16;
+            rel1.to_y: "e.text.status";
+            rel2.relative: 0.95 0.0;
+            rel2.offset: -5 -16;
+            rel2.to_y: "e.text.status";
+            color_class: "/fg/normal/init/text/title";
+            text { font: FNBD; size: 20;
+               text: "Title here";
+               min: 0 1;
+               text_class: "init_title";
+            }
+            fixed: 0 1;
+         }
+      }
+      part { name: "e.text.status"; type: TEXT;
+         scale: 1;
+         clip_to: "fader";
+         description { state: "default" 0.0;
+            align: 0.5 1.0;
+            rel1.relative: 0.05 0.0;
+            rel1.to_y: "logo";
+            rel1.offset: 4 -16;
+            rel2.relative: 0.95 0.0;
+            rel2.offset: -5 -16;
+            rel2.to_y: "logo";
+            color_class: "/fg/normal/init/text/status";
+            text { font: FN; size: 10;
+               text: "Status here";
+               min: 0 1;
+               text_class: "init_status";
+            }
+            fixed: 0 1;
+         }
+      }
+      part { name: "e.text.version"; type: TEXT;
+         scale: 1;
+         clip_to: "fader";
+         description { state: "default" 0.0;
+            align: 1.0 1.0;
+            rel1.relative: 1.0 1.0;
+            rel1.offset: -16 -16;
+            rel2.relative: 1.0 1.0;
+            rel2.offset: -16  -16;
+            color_class: "/fg/normal/init/text/version";
+            text { font: FN; size: 8;
+               text: "0.22.0";
+               min: 1 1;
+               ellipsis: -1;
+               align: 1.0 1.0;
+               text_class: "init_version";
+            }
+            fixed: 1 1;
+         }
+      }
+      part { name: "blanker"; type: RECT; mouse_events: 0;
+         description { state: "default" 0.0;
+            color: 0 0 0 255; // no cc
+            visible: 1;
+         }
+         description { state: "visible" 0.0;
+            inherit: "default" 0.0;
+            color: 0 0 0 0; // no cc
+            visible: 0;
+         }
+      }
+      part { name: "fader"; type: RECT;
+         description { state: "default" 0.0;
+            color: 255 255 255 255; // no cc
+         }
+         description { state: "faded" 0.0;
+            color: 255 255 255 0; // no cc
+         }
+      }
+   }
+   programs {
+      program { signal: "load"; source: "";
+         script {
+            set_int(is_ready, 0);
+            set_int(do_end, 0);
+         }
+      }
+      program { signal: "show"; source: "";
+         action: STATE_SET "visible" 0.0;
+         transition: DECELERATE 1.0 USE_DURATION_FACTOR 1;
+         in: 1.0 0.0;
+         target: "blanker";
+      }
+      program { signal: "show"; source: "";
+         action: STATE_SET "active" 0.0;
+         target: "logo";
+         in: 1.5 0.0;
+         transition: SINUSOIDAL 0.8 USE_DURATION_FACTOR 1;
+         after: "ready";
+      }
+      program { signal: "show"; source: "";
+         action: PLAY_SAMPLE "splash" 1.0 EFFECT;
+      }
+      program { name: "ready";
+         script {
+            new val;
+            val = get_int(do_end);
+            if (val == 1)
+              run_program(PROGRAM:"exit1");
+            else
+              set_int(is_ready, 1);
+         }
+      }
+      program { signal: "e,state,done"; source: "e";
+         script {
+            new val;
+            set_int(do_end, 1);
+            val = get_int(is_ready);
+            if (val == 1)
+            run_program(PROGRAM:"exit1");
+         }
+      }
+      program { name: "exit1";
+         action: STATE_SET "faded" 0.0;
+         transition: SINUSOIDAL 1.0 CURRENT USE_DURATION_FACTOR 1;
+         target: "fader";
+         after: "exit2";
+      }
+      program { name: "exit2";
+         action: SIGNAL_EMIT "e,state,done_ok" "e";
+      }
+   }
+}
+
+group { name: "e/init/extra_screen";
+   script {
+      public is_ready;
+      public do_end;
+   }
+   parts {
+      part { name: "bg"; type: RECT;
+         clip_to: "fader";
+         description { state: "default" 0.0;
+            color_class: "/bg-dark/normal/init/base";
+         }
+      }
+      part { name: "blanker"; type: RECT; mouse_events: 0;
+         description { state: "default" 0.0;
+            color: 0 0 0 255; // no cc
+            visible: 1;
+         }
+         description { state: "visible" 0.0;
+            inherit: "default" 0.0;
+            color: 0 0 0 0; // no cc
+            visible: 0;
+         }
+      }
+      part { name: "fader"; type: RECT;
+         description { state: "default" 0.0;
+            color: 255 255 255 255; // no cc
+         }
+         description { state: "faded" 0.0;
+            color: 255 255 255 0; // no cc
+         }
+      }
+   }
+   programs {
+      program { signal: "load"; source: "";
+         script {
+            set_int(is_ready, 0);
+            set_int(do_end, 0);
+         }
+      }
+      program { signal: "show"; source: "";
+         action: STATE_SET "visible" 0.0;
+         transition: DECELERATE 1.0 USE_DURATION_FACTOR 1;
+         in: 1.0 0.0;
+         target: "blanker";
+         after: "ready";
+      }
+      program { name: "ready";
+         in: 0.5 0.0;
+         script {
+            new val;
+            val = get_int(do_end);
+            if (val == 1)
+              run_program(PROGRAM:"exit1");
+            else
+              set_int(is_ready, 1);
+         }
+      }
+      program { signal: "e,state,done"; source: "e";
+         script {
+            new val;
+            set_int(do_end, 1);
+            val = get_int(is_ready);
+            if (val == 1)
+            run_program(PROGRAM:"exit1");
+         }
+      }
+      program { name: "exit1";
+         action: STATE_SET "faded" 0.0;
+         transition: SINUSOIDAL 1.0 CURRENT USE_DURATION_FACTOR 1;
+         target: "fader";
+         after: "exit2";
+      }
+      program { name: "exit2";
+         action: SIGNAL_EMIT "e,state,done_ok" "e";
+      }
+   }
+}

@@ -1,0 +1,144 @@
+/* bg widget style information
+
+   [SWALLOW]
+      elm.swallow.rectangle: Used for elm_bg_color_set()
+      elm.swallow.background: Used for elm_bg_file_set()
+      elm.swallow.content: Used for elm_layout_part_content_set(bg, "overlay", content).
+*/
+
+group { name: "elm/bg/base/default";
+   data.item: "version" "119";
+   parts {
+      part { name: "clipper"; type: RECT;
+         description { state: "default" 0.0;
+         }
+      }
+      part { name: "base"; type: RECT;
+         description { state: "default" 0.0;
+            color_class: "/bg/normal/background";
+         }
+      }
+      part { name: "elm.swallow.rectangle"; type: SWALLOW;
+         description { state: "default" 0.0;
+         }
+      }
+      part { name: "elm.swallow.background"; type: SWALLOW;
+         clip_to: "clipper";
+         description { state: "default" 0.0;
+            fixed: 1 1;
+         }
+      }
+      part { name: "elm.swallow.content"; type: SWALLOW;
+         description { state: "default" 0.0;
+         }
+      }
+   }
+}
+
+#define BG_PAT(_name, _img, _w, _h, _colbg, _colfg) \
+group { name: _name; \
+   data.item: "version" "119"; \
+   images.image: _img COMP; \
+   parts { \
+      PAT_FILL_SCALE(_w, _h) \
+      part { name: "clipper"; type: RECT; \
+         description { state: "default" 0.0; \
+         } \
+      } \
+      part { name: "base"; type: RECT; \
+         description { state: "default" 0.0; \
+            color_class: _colbg; \
+         } \
+      } \
+      part { name: "pat"; \
+         scale: 1; \
+         description { state: "default" 0.0; \
+            image.normal: _img; \
+            color_class: _colfg; \
+         } \
+      } \
+      part { name: "elm.swallow.rectangle"; type: SWALLOW; \
+         description { state: "default" 0.0; \
+         } \
+      } \
+      part { name: "elm.swallow.background"; type: SWALLOW; \
+         clip_to: "clipper"; \
+         description { state: "default" 0.0; \
+            fixed: 1 1; \
+         } \
+      } \
+      part { name: "elm.swallow.content"; type: SWALLOW; \
+         description { state: "default" 0.0; \
+         } \
+      } \
+   } \
+}
+
+BG_PAT("elm/bg/base/stripes",     "stripes-diag.png",     160, 160, "/bg/normal/background", "/bg-alt/normal/background")
+BG_PAT("elm/bg/base/stripes_big", "stripes-diag-big.png", 160, 160, "/bg/normal/background", "/bg-alt/normal/background")
+
+BG_PAT("elm/bg/base/stripes_dark",     "stripes-diag.png",     160, 160, "/bg-dark/normal/background", "/bg-dark-alt/normal/background")
+BG_PAT("elm/bg/base/stripes_big_dark", "stripes-diag-big.png", 160, 160, "/bg-dark/normal/background", "/bg-dark-alt/normal/background")
+
+BG_PAT("elm/bg/base/stripes_light",     "stripes-diag.png",     160, 160, "/bg-light/normal/background", "/bg-light-alt/normal/background")
+BG_PAT("elm/bg/base/stripes_big_light", "stripes-diag-big.png", 160, 160, "/bg-light/normal/background", "/bg-light-alt/normal/background")
+
+BG_PAT("elm/bg/base/checks",       "checks.png", 160, 160, "/bg/normal/background", "/bg-alt/normal/background")
+BG_PAT("elm/bg/base/checks_big",   "checks.png", 320, 320, "/bg/normal/background", "/bg-alt/normal/background")
+BG_PAT("elm/bg/base/checks_small", "checks.png",  80,  80, "/bg/normal/background", "/bg-alt/normal/background")
+
+BG_PAT("elm/bg/base/checks_dark",       "checks.png", 160, 160, "/bg-dark/normal/background", "/bg-dark-alt/normal/background")
+BG_PAT("elm/bg/base/checks_big_dark",   "checks.png", 320, 320, "/bg-dark/normal/background", "/bg-dark-alt/normal/background")
+BG_PAT("elm/bg/base/checks_small_dark", "checks.png",  80,  80, "/bg-dark/normal/background", "/bg-dark-alt/normal/background")
+
+BG_PAT("elm/bg/base/checks_light",       "checks.png", 160, 160, "/bg-light/normal/background", "/bg-light-alt/normal/background")
+BG_PAT("elm/bg/base/checks_big_light",   "checks.png", 320, 320, "/bg-light/normal/background", "/bg-light-alt/normal/background")
+BG_PAT("elm/bg/base/checks_small_light", "checks.png",  80,  80, "/bg-light/normal/background", "/bg-light-alt/normal/background")
+
+#undef BG_PAT
+
+#define BG_GRADV(_name, _colbg, _colfg) \
+group { name: _name; \
+   data.item: "version" "119"; \
+   images.image: "grad_v.png" COMP; \
+   parts { \
+      part { name: "clipper"; type: RECT; \
+         description { state: "default" 0.0; \
+         } \
+      } \
+      part { name: "base"; type: RECT; \
+         description { state: "default" 0.0; \
+            color_class: _colbg; \
+         } \
+      } \
+      part { name: "grad"; \
+         description { state: "default" 0.0; \
+            image.normal: "grad_v.png"; \
+            fill.size.relative: 0.0 1.0; \
+            fill.size.offset: 256 0; \
+            color_class: _colfg; \
+         } \
+      } \
+      part { name: "elm.swallow.rectangle"; type: SWALLOW; \
+         description { state: "default" 0.0; \
+         } \
+      } \
+      part { name: "elm.swallow.background"; type: SWALLOW; \
+         clip_to: "clipper"; \
+         description { state: "default" 0.0; \
+            fixed: 1 1; \
+         } \
+      } \
+      part { name: "elm.swallow.content"; type: SWALLOW; \
+         description { state: "default" 0.0; \
+         } \
+      } \
+   } \
+}
+
+BG_GRADV("elm/bg/base/grad_vert", "/bg-alt/normal/background", "/bg/normal/background")
+BG_GRADV("elm/bg/base/grad_vert_focus_title_match", "/bg/normal/background", "/bg/selected/titlebar")
+BG_GRADV("elm/bg/base/grad_vert_dark", "/bg-light/normal/background", "/bg-dark-alt/normal/background")
+BG_GRADV("elm/bg/base/grad_vert_light", "/bg/normal/background", "/bg-light-alt/normal/background")
+
+#undef BG_GRADV

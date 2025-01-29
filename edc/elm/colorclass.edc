@@ -1,0 +1,353 @@
+group { "elm/layout/colorclass/base"; program_source: "elm"; nobroadcast;
+   parts {
+      rect { "clip"; }
+      rect { "remote_fader";
+         desc { hid;
+            color_class: "/dim/normal/hover";
+            color: 255 255 255 0; // no cc
+         }
+         desc { "vis"; inherit;
+            color: 255 255 255 255; // no cc
+            link.base: "elm,state,remote";
+         }
+         program { signal: "mouse,down,1"; source: "remote_fader";
+            action: SIGNAL_EMIT "elm,colorclass,dismiss" "elm";
+         }
+      }
+      rect { "list_bg";
+         desc {
+            color_class: "/bg/normal/colorclass";
+            rel.to: "elm.swallow.list";
+         }
+      }
+      swallow { "elm.swallow.list";
+         desc {}
+         desc { "remote";
+            rel1.relative: 0.1 0.1;
+            rel2.relative: 0.9 0.9;
+            link.base: "elm,state,remote";
+         }
+      }
+      rect { "fader";
+         desc { hid;
+            color_class: "/dim/normal/hover";
+            color: 255 255 255 0; // no cc
+         }
+         desc { "vis"; inherit; vis;
+            color: 255 255 255 255; // no cc
+         }
+         desc { "vis_remote"; inherit; vis;
+            color: 255 255 255 0; // no cc
+         }
+         program { signal: "mouse,down,1"; source: "fader";
+            action: SIGNAL_EMIT "elm,colorclass,deactivate" "elm";
+         }
+      }
+      rect { "bg";
+         scale;
+         desc { hid;
+            rel1.offset: 40 40;
+            rel2.offset: -41 -41;
+            color: 255 255 255 0; // no cc
+            color_class: "/bg/normal/colorclass";
+            offscale;
+         }
+         desc { "vis"; inherit;  vis;
+            color: 255 255 255 255; // no cc
+         }
+      }
+      rect { "colorclip"; clip: "clip";
+         desc { align: 0 0;
+            rel2.relative: 1 0;
+            rel2.to_y: "elm.swallow.reset";
+         }
+      }
+      alias: "elm.swallow.colors" "colors:colors";
+      group { "colors"; source: "colorclass/colors"; clip: "colorclip";
+         scale;
+         desc { hid; align: 0 0;
+            offscale;
+            rel.to: "bg";
+            rel1.offset: 4 4;
+            rel2.offset: -5 -5;
+            rel2.relative: 1.0 0.0;
+            rel2.to_y: "elm.swallow.reset";
+            fixed: 1 1;
+         }
+         desc { "vis"; inherit; vis;
+            fixed: 1 1;
+         }
+      }
+      swallow { "elm.swallow.reset"; clip: "clip";
+         scale;
+         desc { hid; min: 40 24; max: 40 24;
+            rel.to: "bg";
+            align: 0.5 1.0;
+            fixed: 1 1;
+            rel1.relative: 0.0 1.0;
+            rel1.offset: 4 -5;
+            rel2.offset: -5 -5;
+            min: 80 20;
+            offscale;
+         }
+         desc { "vis"; inherit: "default"; vis;
+         }
+      }
+      rect { "text_bg";
+         desc { hid;
+            color_class: "/bg/normal/colorclass/text";
+            rel1.relative: 0.5 0.5;
+            rel2.relative: 0.5 0.5;
+            color: 255 255 255 0; // no cc
+         }
+         desc { "vis"; inherit; vis;
+            rel.to: "elm.swallow.list";
+            rel1.relative: 0.0 0.0;
+            rel2.relative: 1.0 1.0;
+            color: 255 255 255 255; // no cc
+         }
+      }
+      text { "elm.text";
+         scale;
+         desc { hid;
+            color_class: "/fg/normal/colorclass/text";
+            rel1.relative: 0.1 0.1;
+            rel2.relative: 0.9 0.9;
+            text { font: FN; size: 10;
+              min: 1 1;
+              ellipsis: -1;
+              fit: 1 0;
+            }
+         }
+         desc { "vis"; inherit: "default"; vis; }
+      }
+      program { signal: "elm,state,info";
+         action: STATE_SET "vis";
+         transition: LINEAR 0.2;
+         targets: "text_bg" "elm.text";
+      }
+      program { signal: "elm,state,loaded";
+         action: STATE_SET "default";
+         transition: LINEAR 0.2;
+         targets: "text_bg" "elm.text";
+      }
+      program { signal: "elm,colors,hide";
+         action: STATE_SET "default";
+         transition: LINEAR 0.2;
+         targets: "fader" "colors" "elm.swallow.reset" "bg";
+      }
+      program { signal: "elm,colors,show";
+         transition: LINEAR 0.2;
+         action: STATE_SET "vis";
+         targets: "colors" "elm.swallow.reset" "bg";
+      }
+      program { signal: "elm,colors,show";
+         transition: LINEAR 0.2;
+         action: STATE_SET "vis";
+         targets: "fader";
+         filter: "remote_fader" "default";
+      }
+      program { signal: "elm,colors,show";
+         transition: LINEAR 0.2;
+         action: STATE_SET "vis_remote";
+         targets: "fader";
+         filter: "remote_fader" "vis";
+      }
+      program { signal: "select,1"; source: "colors:elm";
+         action: SIGNAL_EMIT "elm,colorclass,select,1" "elm";
+      }
+      program { signal: "select,2"; source: "colors:elm";
+         action: SIGNAL_EMIT "elm,colorclass,select,2" "elm";
+      }
+      program { signal: "select,3"; source: "colors:elm";
+         action: SIGNAL_EMIT "elm,colorclass,select,3" "elm";
+      }
+   }
+}
+
+group { "colorclass/colors"; program_source: "elm"; nobroadcast;
+   parts {
+      rect { "glow"; nomouse;
+         desc {
+            rel.to: "color1";
+            rel1.offset: -7 -7;
+            rel2.offset: 8 8;
+            rel2.relative: 1 1;
+            fixed: 1 1;
+            color: 0 0 0 0; // no cc
+         }
+         desc { "color2"; inherit: "default";
+            rel.to: "color2";
+         }
+         desc { "color3"; inherit: "default";
+            rel.to: "color3";
+         }
+      }
+      group { "color1"; source: "colorclass/color1";
+         desc { min: 1 1; max: 1 1; hid;
+            link.base: "hide" "";
+         }
+         desc { "vis"; align: 0 0;
+            rel1.to_x: "colors";
+            rel2.to_x: "color2";
+            rel2.relative: 0 0;
+            rel2.offset: -3 -1;
+            fixed: 1 1;
+            min: SOURCE;
+            link.base: "show" "";
+         }
+         program { signal: "mouse,down,1"; source: "color1";
+            action: SIGNAL_EMIT "select,1" "elm";
+            sequence {
+               action: STATE_SET "default";
+               transition: LINEAR 0.2;
+               target: "glow";
+            }
+         }
+      }
+      group { "color2"; source: "colorclass/color2";
+         desc { min: 1 1; max: 1 1; hid;
+            link.base: "hide" "";
+         }
+         desc { "vis"; align: 0.5 0;
+            rel1.relative: 1 0;
+            rel2.relative: 0 0;
+            fixed: 1 1;
+            min: SOURCE;
+            link.base: "show" "";
+         }
+         program { signal: "mouse,down,1"; source: "color2";
+            action: SIGNAL_EMIT "select,2" "elm";
+            sequence {
+               action: STATE_SET "color2";
+               transition: LINEAR 0.2;
+               target: "glow";
+            }
+         }
+      }
+      group { "color3"; source: "colorclass/color3";
+         desc { min: 1 1; max: 1 1; hid;
+            link.base: "hide" "";
+         }
+         desc { "vis"; align: 1 0;
+            rel1.relative: 1 0;
+            rel2.to_x: "colors";
+            rel2.relative: 1 0;
+            fixed: 1 1;
+            min: SOURCE;
+            link.base: "show" "";
+         }
+         program { signal: "mouse,down,1"; source: "color3";
+            action: SIGNAL_EMIT "select,3" "elm";
+            sequence {
+               action: STATE_SET "color3";
+               transition: LINEAR 0.2;
+               target: "glow";
+            }
+         }
+      }
+      swallow { "colors";
+         desc { align: 0 0;
+            rel1.to_y: "color1";
+            rel1.relative: 0 1;
+            rel1.offset: 0 10;
+            rel2.relative: 1 0;
+            fixed: 1 1;
+         }
+      }
+      text { "colortext";
+         scale;
+         desc { align: 0 0;
+            rel1.to_y: "colors";
+            rel1.relative: 0 1;
+            rel1.offset: 0 10;
+            rel2.relative: 1 0;
+            fixed: 1 1;
+            color_class: "elm_colorclass_text";
+            text { font: FNBD; size: 12;
+              min: 1 1;
+              ellipsis: -1;
+              text: "ABC123abc!@#";
+            }
+         }
+      }
+   }
+}
+
+group { "colorclass/color1"; nomouse; nobroadcast;
+   parts {
+      rect { "event"; mouse;
+         desc {
+            color: 0 0 0 0; // no cc
+            fixed: 1 1;
+         }
+      }
+      rect { "clip"; }
+      rect { "bg"; clip: "clip";
+         desc {
+            rel.to: "color";
+            color_class: "/bg/normal/colorclass/color";
+            fixed: 1 1;
+         }
+      }
+      rect { "color"; clip: "clip";
+         scale;
+         desc { align: 0 0.5;
+            min: 40 20;
+            max: 40 20;
+            color: 255 255 255 255; // no cc
+            color_class: "elm_colorclass_color1";
+            fixed: 1 1;
+         }
+      }
+      text { "text"; clip: "clip";
+         scale: 1;
+         desc { align: 0 0.5;
+            rel1.offset: 4 4;
+            rel1.to_x: "color";
+            rel1.relative: 1.0 0.0;
+            rel2.offset: -5 -5;
+            rel2.relative: 1.0 1.0;
+            fixed: 1 1;
+            color_class: "/fg/normal/colorclass/color/text";
+            offscale;
+            text { font: FN; size: 10;
+              min: 1 1;
+              ellipsis: -1;
+              text_class: "radio";
+              text: "Base";
+            }
+         }
+      }
+   }
+}
+
+group { "colorclass/color2"; inherit: "colorclass/color1";
+   parts {
+      rect { "color";
+         desc { "default";
+            color_class: "elm_colorclass_color2";
+         }
+      }
+      text { "text";
+         desc { "default";
+            text.text: "Outline";
+         }
+      }
+   }
+}
+
+group { "colorclass/color3"; inherit: "colorclass/color1";
+   parts {
+      rect { "color";
+         desc { "default";
+            color_class: "elm_colorclass_color3";
+         }
+      }
+      text { "text";
+         desc { "default";
+            text.text: "Shadow";
+         }
+      }
+   }
+}
