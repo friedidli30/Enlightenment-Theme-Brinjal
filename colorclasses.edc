@@ -683,7 +683,7 @@ color_classes {
    color_class { name: ":fg-dim";
       color: 128 128 128 255; }
    color_class { name: ":fg";
-      color: 160 160 160 255; }
+      color: 230 230 230 230; }
    color_class { name: ":fg-prehigh";
       color: 192 192 192 255; }
    color_class { name: ":fg-high";
