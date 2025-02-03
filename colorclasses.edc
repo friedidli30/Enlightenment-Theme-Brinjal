@@ -657,7 +657,7 @@ color_classes {
    color_class { name: ":bg-alt-light";
       color:  58  58  58 255; }
    color_class { name: ":bg-alt";
-      color:  217 129 186 208; }
+      color:  80 63 137 255; }
    color_class { name: ":bg-dim";
       color:  145  167  11 255; }
    color_class { name: ":bg-dark";
@@ -673,7 +673,7 @@ color_classes {
    color_class { name: ":bg-high";
       color:  80  80  80 255; }
    color_class { name: ":bg-higher";
-      color:  237  42 0 180; }
+      color:  150  184  39 220; }
    color_class { name: ":bg-highest";
       color: 112 112 112 255; }
    color_class { name: ":bg-light";
@@ -1049,7 +1049,7 @@ color_classes {
    color_class { name: "/bg/normal/titlebar";
       color:  113 98 151 220; }
    color_class { name: "/bg/selected/titlebar";
-      color:  125  148  8 220; }
+      color:  150  184  39 220; }
 //   color_class { name: "/bg/normal/border";
 //      color:  64  64  64 255; }
 //   color_class { name: "/bg/selected/border";
