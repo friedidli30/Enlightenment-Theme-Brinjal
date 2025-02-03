@@ -643,7 +643,7 @@ color_classes {
 // sharing that specific cc.
 ///////////////////////////////////////////////////////////////////////////////
    color_class { name: ":bg";
-      color:  149 188 138 255; }
+      color:  103 89 177 255; }
    color_class { name: ":bg-semi";
       color:  64  64  64 182; }
    color_class { name: ":bg-trans";
@@ -657,7 +657,7 @@ color_classes {
    color_class { name: ":bg-alt-light";
       color:  58  58  58 255; }
    color_class { name: ":bg-alt";
-      color:  139 130 190 255; }
+      color:  217 120 120 255; }
    color_class { name: ":bg-dim";
       color:  48  48  48 255; }
    color_class { name: ":bg-dark";
@@ -693,7 +693,7 @@ color_classes {
    color_class { name: ":fg-light";
       color: 255 255 255 255; }
    color_class { name: ":selected";
-      color:  51 153 255 255; }
+      color:  144 217 120 140; }
    color_class { name: ":selected-light";
       color:  51 153 255  25; }
    color_class { name: ":selected-medium";
