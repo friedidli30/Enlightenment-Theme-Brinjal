@@ -657,7 +657,7 @@ color_classes {
    color_class { name: ":bg-alt-light";
       color:  58  58  58 255; }
    color_class { name: ":bg-alt";
-      color:  150 100 50 200; }
+      color:  217 129 186 208; }
    color_class { name: ":bg-dim";
       color:  145  167  11 255; }
    color_class { name: ":bg-dark";
