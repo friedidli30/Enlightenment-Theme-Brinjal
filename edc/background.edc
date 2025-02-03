@@ -12,7 +12,7 @@ group { name: "e/desktop/background";
          clip_to: "clip";
          description { state: "default" 0.0;
             image.normal: "background.png";
-            image.scale_hint: STATIC;
+	    image.scale_hint: STATIC;
             ASPECT_FILL((7680/4320))
          }
       }
