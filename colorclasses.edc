@@ -659,7 +659,7 @@ color_classes {
    color_class { name: ":bg-alt";
       color:  217 120 120 255; }
    color_class { name: ":bg-dim";
-      color:  48  48  48 255; }
+      color:  145  167  11 255; }
    color_class { name: ":bg-dark";
       color:  66  63  165 245; }
    color_class { name: ":bg-dark-invisible";
