@@ -1049,7 +1049,7 @@ color_classes {
    color_class { name: "/bg/normal/titlebar";
       color:  113 98 151 220; }
    color_class { name: "/bg/selected/titlebar";
-      color:  63 165 124 245; }
+      color:  145  167  11 255; }
 //   color_class { name: "/bg/normal/border";
 //      color:  64  64  64 255; }
 //   color_class { name: "/bg/selected/border";
