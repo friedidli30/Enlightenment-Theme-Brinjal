@@ -657,7 +657,7 @@ color_classes {
    color_class { name: ":bg-alt-light";
       color:  58  58  58 255; }
    color_class { name: ":bg-alt";
-      color:  80 63 137 255; }
+      color:  64 33 131 255; }
    color_class { name: ":bg-dim";
       color:  145  167  11 255; }
    color_class { name: ":bg-dark";
@@ -673,7 +673,7 @@ color_classes {
    color_class { name: ":bg-high";
       color:  80  80  80 255; }
    color_class { name: ":bg-higher";
-      color:  150  184  39 220; }
+      color:  218  102  42 220; }
    color_class { name: ":bg-highest";
       color: 112 112 112 255; }
    color_class { name: ":bg-light";
