@@ -693,7 +693,7 @@ color_classes {
    color_class { name: ":fg-light";
       color: 255 255 255 255; }
    color_class { name: ":selected";
-      color:  144 217 120 140; }
+      color: 150  184  39 220; }
    color_class { name: ":selected-light";
       color:  51 153 255  25; }
    color_class { name: ":selected-medium";
