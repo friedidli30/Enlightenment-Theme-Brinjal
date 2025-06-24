@@ -673,7 +673,7 @@ color_classes {
    color_class { name: ":bg-high";
       color:  80  80  80 255; }
    color_class { name: ":bg-higher";
-      color:  210  25  0 180; }
+      color:  57  35  160 150; }
    color_class { name: ":bg-highest";
       color: 112 112 112 255; }
    color_class { name: ":bg-light";
