@@ -2,7 +2,6 @@ group { name: "e/desktop/background";
    alias: "elm/ews/background/default";
    BACKGROUND_IMG
    images.image: "background.png" COMP;
-   images.image: "dot_pattern.png" COMP;
    parts {
       part { name: "clip"; type: RECT; mouse_events: 0;
          description { state: "default" 0.0;
@@ -14,12 +13,6 @@ group { name: "e/desktop/background";
             image.normal: "background.png";
 	    image.scale_hint: STATIC;
             ASPECT_FILL((7680/4320))
-         }
-      }
-      part { name: "pat";
-         description { state: "default" 0.0;
-            image.normal: "dot_pattern.png";
-            TILED_PATTERN(256, 256)
          }
       }
    }
